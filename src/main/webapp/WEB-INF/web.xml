@@ -11,7 +11,7 @@
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 	    <init-param>
 		    <param-name>com.sun.jersey.config.property.packages</param-name>
-		    <param-value>edu.byu.ical.rest;org.codehaus.jackson.jaxrs</param-value>
+		    <param-value>edu.byu.mobile.ical.rest</param-value>
 	    </init-param>
         <load-on-startup>0</load-on-startup>
     </servlet>
