@@ -30,9 +30,9 @@ import java.util.*;
 /**
  * @author jmooreoa
  */
-public class MainEndpointTest extends JerseyTest {
+public class MainEndpointIntegrationTest extends JerseyTest {
 
-    public MainEndpointTest() throws Exception {
+    public MainEndpointIntegrationTest() throws Exception {
         contextPath = "/ical-test";
         servletPath = "/rest";
         ApplicationDescriptor ad = new ApplicationDescriptor()
