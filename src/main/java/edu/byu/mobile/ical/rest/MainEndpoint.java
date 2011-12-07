@@ -36,7 +36,7 @@ public class MainEndpoint {
 
     @SuppressWarnings({"unchecked"})
     @GET
-    public List<Event> parse(
+    public Event[] parse(
             @QueryParam("feedUrl") URL feedUrl,
             @QueryParam("show") @DefaultValue(DEFAULT_SHOW) TimePeriod show,
             @QueryParam("until") @DefaultValue(UNTIL_NEVER) String until
@@ -55,7 +55,9 @@ public class MainEndpoint {
 
         final Date startDate = calculateStartDate();
 
-        return filterComponents(calendar.getComponents(), startDate, calculateEndDate(startDate, show, until));
+        final List<Event> events = filterComponents(calendar.getComponents(), startDate, calculateEndDate(startDate, show, until));
+
+        return events.toArray(new Event[events.size()]);
     }
 
     private static Date calculateStartDate() {
