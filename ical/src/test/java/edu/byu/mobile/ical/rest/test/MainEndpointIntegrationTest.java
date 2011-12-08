@@ -115,7 +115,7 @@ public class MainEndpointIntegrationTest extends JerseyTest {
         final Date end = cal.getTime();
 
         final String content = webResource
-                .path("/")
+                .path("/parse")
                 .queryParam("feedUrl", URLEncoder.encode("http://calendar.byu.edu/calendar/ical/2", "UTF-8"))
                 .queryParam("until", new SimpleDateFormat("yyyy-MM-dd").format(end))
                 .get(String.class);
@@ -135,7 +135,7 @@ public class MainEndpointIntegrationTest extends JerseyTest {
 
     protected void testOneShot(TimePeriod howLong) throws Exception {
         final String content = webResource
-                .path("/")
+                .path("/parse")
                 .queryParam("feedUrl", URLEncoder.encode(oneShotFile.toURI().toString(), "UTF-8"))
                 .queryParam("show", howLong.toString()).get(String.class);
         java.util.Calendar cal = java.util.Calendar.getInstance();
@@ -152,7 +152,7 @@ public class MainEndpointIntegrationTest extends JerseyTest {
 
     protected void testRecurring(Date finalRecurrence) throws Exception {
         final String content = webResource
-                .path("/")
+                .path("/parse")
                 .queryParam("feedUrl", URLEncoder.encode(recurringFile.toURI().toString(), "UTF-8"))
                 .queryParam("until", new SimpleDateFormat("yyyy-MM-dd").format(finalRecurrence))
                 .get(String.class);
@@ -193,27 +193,39 @@ public class MainEndpointIntegrationTest extends JerseyTest {
     }
 
     private static void assertEventEquals(Event event, JSONObject json) throws JSONException, ParseException {
-        assertEquals(event.getUid(), json.optString("uid", null));
-        assertEquals(event.getDescription(), json.optString("description", null));
-        assertEquals(event.getLocation(), json.optString("location", null));
+        assertEquals(event.getUid(), nullString(json, "uid"));
+        assertEquals(event.getDescription(), nullString(json, "description"));
+        assertEquals(event.getLocation(), nullString(json, "location"));
         assertDateEquals(event.getStartDate(), optDate(json, "startDate"));
-        assertEquals(event.getSummary(), json.optString("summary", null));
-        assertEquals(event.getUrl(), json.optString("url", null));
+        assertEquals(event.getSummary(), nullString(json, "summary"));
+        assertEquals(event.getUrl(), nullString(json, "url"));
         assertDateEquals(event.getEndDate(), optDate(json, "endDate"));
         assertEquals(event.isAllDay(), json.optBoolean("allDay"));
-        assertEquals(event.getRepeatRule(), json.optString("repeatRule", null));
-        assertEquals(event.getRepeatExceptionDate(), json.optString("repeatExceptionDate", null));
+        assertEquals(event.getRepeatRule(), nullString(json, "repeatRule"));
+        assertEquals(event.getRepeatExceptionDate(), nullString(json, "repeatExceptionDate"));
         assertDateEquals(event.getModified(), optDate(json, "modified"));
         assertEquals(event.getOccurrences().size(), json.getJSONArray("occurrences").length());
     }
 
     private static Date optDate(JSONObject json, String key) throws ParseException {
-        final String raw = json.optString(key, null);
-        if (raw == null || json.isNull(key)) {
+        final String raw = nullString(json, key);
+        if (raw == null) {
             return null;
         }
         return DF.parse(raw);
     }
+
+	private static String nullString(JSONObject object, String key) {
+		return nullString(object, key, null);
+	}
+
+	private static String nullString(JSONObject object, String key, String def) {
+		if (object.isNull(key) || !object.has(key)) {
+			return def;
+		}
+		return object.optString(key, def);
+	}
+
 
     private static void assertDateEquals(Date d1, Date d2) {
         if (d1 == null && d2 == null) {

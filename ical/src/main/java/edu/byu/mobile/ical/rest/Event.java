@@ -8,9 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Represents an event.
  * @author jmooreoa
  */
-
 public class Event {
     private String uid;
     private String summary;
@@ -36,7 +36,7 @@ public class Event {
         if (event.getStartDate() != null)
             this.startDate = event.getStartDate().getDate();
         if (event.getEndDate(true) != null)
-            this.endDate = event.getEndDate(true).getDate();
+            this.endDate = event.getEndDate(event.getDuration() != null && event.getDuration().getValue() != null).getDate();
         if (occurrences != null)
             this.occurrences = TimeSpan.fromIcal(occurrences);
         if (event.getLocation() != null)

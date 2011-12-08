@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.byu.mobile.ical</groupId>
 	<artifactId>ical-parser-rest</artifactId>
@@ -58,52 +58,52 @@
 			<artifactId>jersey-core</artifactId>
 			<version>${jersey.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>com.sun.jersey.test.framework</groupId>
-            <artifactId>jersey-test-framework</artifactId>
-            <version>${jersey.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.sun.jersey.test.framework</groupId>
+			<artifactId>jersey-test-framework</artifactId>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>jsr311-api</artifactId>
 			<version>1.0</version>
 			<scope>compile</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.mnode.ical4j</groupId>
-            <artifactId>ical4j</artifactId>
-            <version>1.0.2</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-jaxrs</artifactId>
-            <version>${jackson.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>${jackson.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jackson.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>2010.06.01</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-web</artifactId>
-            <version>2.0.4</version>
-        </dependency>
+		<dependency>
+			<groupId>org.mnode.ical4j</groupId>
+			<artifactId>ical4j</artifactId>
+			<version>1.0.2</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>${jackson.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>${jackson.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>${jackson.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>2010.06.01</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-web</artifactId>
+			<version>2.0.4</version>
+		</dependency>
 	</dependencies>
 
 	<properties>
@@ -116,59 +116,67 @@
 		<finalName>ical-parsing-rest</finalName>
 		<plugins>
 			<plugin>
-				<groupId>org.glassfish.maven.plugin</groupId>
-				<artifactId>maven-glassfish-plugin</artifactId>
-				<version>2.1</version>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+				<version>6.1.10</version>
 				<configuration>
-					<glassfishDirectory>${env.GLASSFISH_HOME}</glassfishDirectory>
-					<user>admin</user>
-					<passwordFile>${user.home}/.asadmin-passwords</passwordFile>
-					<autoCreate>true</autoCreate>
-					<debug>true</debug>
-					<domain>
-						<name>domain1</name>
-						<adminPort>4848</adminPort>
-						<httpPort>8080</httpPort>
-						<httpsPort>8443</httpsPort>
-					</domain>
-					<components>
-						<component>
-							<name>${project.artifactId}-${project.version}</name>
-							<artifact>${project.build.directory}/${project.build.finalName}.war</artifact>
-						</component>
-					</components>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<stopKey>foo</stopKey>
+					<stopPort>9999</stopPort>
 				</configuration>
-			</plugin>
-			<!--<plugin>-->
-				<!--<groupId>org.mortbay.jetty</groupId>-->
-				<!--<artifactId>maven-jetty-plugin</artifactId>-->
-				<!--<version>6.1.10</version>-->
-				<!--<configuration>-->
-					<!--<scanIntervalSeconds>10</scanIntervalSeconds>-->
-					<!--<stopKey>foo</stopKey>-->
-					<!--<stopPort>9999</stopPort>-->
-				<!--</configuration>-->
-				<!--<executions>-->
-					<!--<execution>-->
-						<!--<id>start-jetty</id>-->
+				<executions>
+					<execution>
+						<id>start-jetty</id>
 						<!--<phase>pre-integration-test</phase>-->
-						<!--<goals>-->
-							<!--<goal>run</goal>-->
-						<!--</goals>-->
-						<!--<configuration>-->
-							<!--<scanIntervalSeconds>0</scanIntervalSeconds>-->
-							<!--<daemon>true</daemon>-->
-						<!--</configuration>-->
-					<!--</execution>-->
-					<!--<execution>-->
-						<!--<id>stop-jetty</id>-->
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<scanIntervalSeconds>0</scanIntervalSeconds>
+							<daemon>true</daemon>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-jetty</id>
 						<!--<phase>post-integration-test</phase>-->
-						<!--<goals>-->
-							<!--<goal>stop</goal>-->
-						<!--</goals>-->
-					<!--</execution>-->
-				<!--</executions>-->
-			<!--</plugin>-->
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.jackson</groupId>
+						<artifactId>jackson-jaxrs</artifactId>
+						<version>${jackson.version}</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>org.codehaus.jackson</groupId>
+						<artifactId>jackson-core-asl</artifactId>
+						<version>${jackson.version}</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>org.codehaus.jackson</groupId>
+						<artifactId>jackson-mapper-asl</artifactId>
+						<version>${jackson.version}</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-server</artifactId>
+						<version>${jersey.version}</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+						<version>${jersey.version}</version>
+						<scope>runtime</scope>
+					</dependency>
+				</dependencies>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.enunciate</groupId>
 				<artifactId>maven-enunciate-plugin</artifactId>
@@ -192,6 +200,16 @@
 						<version>1.4.2</version>
 						<scope>system</scope>
 						<systemPath>${java.home}/../lib/tools.jar</systemPath>
+					</dependency>
+					<dependency>
+						<groupId>org.codehaus.enunciate</groupId>
+						<artifactId>enunciate-jersey</artifactId>
+						<version>1.24</version>
+					</dependency>
+					<dependency>
+						<groupId>org.codehaus.enunciate</groupId>
+						<artifactId>enunciate-xml</artifactId>
+						<version>1.24</version>
 					</dependency>
 				</dependencies>
 			</plugin>
