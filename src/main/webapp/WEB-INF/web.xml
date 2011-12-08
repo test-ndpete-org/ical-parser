@@ -30,7 +30,7 @@
 
     <context-param>
         <param-name>disable-cache</param-name>
-        <param-value>true</param-value>
+        <param-value>false</param-value>
     </context-param>
 
     <servlet-mapping>

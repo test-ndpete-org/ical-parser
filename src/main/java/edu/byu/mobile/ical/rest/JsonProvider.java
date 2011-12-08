@@ -6,9 +6,18 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * @author jmooreoa
@@ -18,12 +27,15 @@ public class JsonProvider extends JacksonJsonProvider {
     public JsonProvider() {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
-        mapper.getSerializationConfig().setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		df.setTimeZone(TimeZone.getTimeZone("America/Denver"));
+		mapper.getSerializationConfig().setDateFormat(df);
         setMapper(mapper);
     }
 
-    @Override
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return super.isWriteable(type, genericType, annotations, mediaType);
-    }
+	@Override
+	public void writeTo(Object value, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
+		super._configuredMapper.getSerializationConfig().getDateFormat().setTimeZone(TimeZone.getTimeZone("America/Denver"));
+		super.writeTo(value, type, genericType, annotations, mediaType, httpHeaders, entityStream);
+	}
 }

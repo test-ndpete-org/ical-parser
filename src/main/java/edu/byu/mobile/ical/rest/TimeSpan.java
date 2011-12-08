@@ -1,6 +1,6 @@
 package edu.byu.mobile.ical.rest;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Period;
 
 import java.util.*;
@@ -22,7 +22,8 @@ public class TimeSpan implements Comparable<TimeSpan> {
     private TimeSpan(final Period period) {
         start = period.getStart() == null ? null : new Date(period.getStart().getTime());
         end = period.getEnd() == null ? null : new Date(period.getEnd().getTime());
-        allDay = period.isEmpty();
+		final Dur dur = period.getDuration();
+        allDay = dur.getDays() == 0 && dur.getHours() == 23 && dur.getMinutes() == 59 && dur.getSeconds() == 59;
     }
 
     public static List<TimeSpan> fromIcal(final Set<Period> occurrences) {
