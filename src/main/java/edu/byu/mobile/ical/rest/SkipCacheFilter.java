@@ -1,13 +1,14 @@
 package edu.byu.mobile.ical.rest;
 
 import javax.servlet.*;
-import javax.servlet.Filter;
+import net.sf.ehcache.constructs.web.filter.Filter;
+
 import java.io.IOException;
 
 /**
  * @author jmooreoa
  */
-public class SkipCacheFilter implements Filter {
+public class SkipCacheFilter implements javax.servlet.Filter {
     public static final String SKIP_CACHE_PARAM_KEY = "skipCacheParam";
     public static final String DEFAULT_SKIP_CACHE_PARAM = "skip-cache";
 
@@ -27,7 +28,7 @@ public class SkipCacheFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (shouldSkip(request)) {
-            request.setAttribute(net.sf.ehcache.constructs.web.filter.Filter.NO_FILTER, Boolean.TRUE);
+            request.setAttribute(Filter.NO_FILTER, Boolean.TRUE);
         }
 
         chain.doFilter(request, response);
