@@ -150,7 +150,11 @@ public class MainEndpoint {
             @QueryParam("until") @DefaultValue(UNTIL_NEVER) String until
     ) {
         LOG.debug(String.format("Got request for calendar at '%s' with show = '%s' and until = '%s'", feedUrl, show, until));
-        final CalendarBuilder builder = new CalendarBuilder();
+        if (feedUrl == null) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+
+		final CalendarBuilder builder = new CalendarBuilder();
 
         final Calendar calendar;
         try {

@@ -3,7 +3,6 @@ package edu.byu.mobile.ical.rest;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -14,9 +13,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -35,7 +31,7 @@ public class JsonProvider extends JacksonJsonProvider {
 
 	@Override
 	public void writeTo(Object value, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
-		super._configuredMapper.getSerializationConfig().getDateFormat().setTimeZone(TimeZone.getTimeZone("America/Denver"));
+//		super._configuredMapper.getSerializationConfig().getDateFormat().setTimeZone(TimeZone.getTimeZone("America/Denver"));
 		super.writeTo(value, type, genericType, annotations, mediaType, httpHeaders, entityStream);
 	}
 }
