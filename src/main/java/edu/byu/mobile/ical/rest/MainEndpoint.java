@@ -1,13 +1,19 @@
 package edu.byu.mobile.ical.rest;
 
+import com.sun.jersey.api.representation.Form;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.ExDate;
+import net.fortuna.ical4j.model.property.ExDateFactory;
+import net.fortuna.ical4j.model.property.RRule;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URL;
@@ -17,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
-@Path("/parse")
+@Path("/")
 @Produces({"application/json", "text/json"})
 public class MainEndpoint {
 
@@ -29,7 +35,8 @@ public class MainEndpoint {
 
     public static final String DEFAULT_SHOW = "3MO";
 
-    public static final TimePeriod DEFAULT_SHOW_VALUE = TimePeriod.valueOf(DEFAULT_SHOW);
+	public static final TimePeriod DEFAULT_SHOW_VALUE = TimePeriod.valueOf(DEFAULT_SHOW);
+	private static final String START_TODAY = "today";
 
 	/**
 	 *
@@ -138,14 +145,17 @@ public class MainEndpoint {
 	 * All dates are in ISO-8601 notation, in which the beginning of the Unix Epoch would be formatted "1970-01-01T00:00:00.000+0000".
 	 *
 	 * @param feedUrl the URL of the feed to parse.
+	 * @param start starting date for the set which will be returned
 	 * @param show period for which to calculate occurrences
 	 * @param until date until which occurrences will be calculated
 	 * @return all events occurring within the specified time frame
 	 */
+	@Path("/parse")
     @SuppressWarnings({"unchecked"})
     @GET
     public Event[] parse(
             @QueryParam("feedUrl") URL feedUrl,
+			@QueryParam("start") @DefaultValue(START_TODAY) String start,
             @QueryParam("show") @DefaultValue(DEFAULT_SHOW) TimePeriod show,
             @QueryParam("until") @DefaultValue(UNTIL_NEVER) String until
     ) {
@@ -165,15 +175,96 @@ public class MainEndpoint {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        final Date startDate = calculateStartDate();
+        final Date startDate = calculateStartDate(start);
 
         final List<Event> events = filterComponents(calendar.getComponents(), startDate, calculateEndDate(startDate, show, until));
 
         return events.toArray(new Event[events.size()]);
     }
 
-    private static Date calculateStartDate() {
+	@GET
+	@Path("/occurrences")
+	public TimeSpan[] calculateOccurrences(
+			@QueryParam("start") @DefaultValue(START_TODAY) String start,
+            @QueryParam("show") @DefaultValue(DEFAULT_SHOW) TimePeriod show,
+            @QueryParam("until") @DefaultValue(UNTIL_NEVER) String until,
+			@QueryParam("ruleStart") String ruleStart,
+			@QueryParam("ruleEnd") String ruleEnd,
+			@QueryParam("rule") String rule,
+			@QueryParam("exceptions") String exceptions) {
+		try {
+			return doCalculateOccurrences(start, show, until, ruleStart, ruleEnd, rule, exceptions);
+		} catch (ParseException e) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+	}
+
+	@POST
+	@Path("/occurrences")
+	@Consumes({"text/json", "application/json"})
+	public TimeSpan[] calculateOccurrences(OccurrencesRequest request) {
+		try {
+			return doCalculateOccurrences(request.getStart(), request.getShow(), request.getUntil(), request.getRuleStart(), request.getRuleEnd(), request.getRule(), request.getExceptions());
+		} catch (ParseException e) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+	}
+
+	@POST
+	@Path("/occurrences")
+	@Consumes("application/x-www-form-urlencoded")
+	public TimeSpan[] calculateOccurrences(MultivaluedMap<String, String> map) {
+		try {
+			return doCalculateOccurrences(
+					map.getFirst("start"),
+					map.containsKey("show") ? TimePeriod.valueOf(map.getFirst("show")) : DEFAULT_SHOW_VALUE,
+					map.getFirst("until"),
+					map.getFirst("ruleStart"),
+					map.getFirst("ruleEnd"),
+					map.getFirst("rule"),
+					map.getFirst("exceptions")
+			);
+		} catch (ParseException e) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+	}
+
+	private static TimeSpan[] doCalculateOccurrences(
+			String start,
+			TimePeriod show,
+			String until,
+			String ruleStartDate,
+			String ruleEndDate,
+			String rule,
+			String exceptionDate
+	) throws ParseException {
+		final Date from = calculateStartDate(start);
+		final Date to = calculateEndDate(from, show, until);
+
+		final DateTime ruleStart = new DateTime(ruleStartDate);
+		final DateTime ruleEnd = new DateTime(ruleEndDate);
+
+		final Period period = new Period(new DateTime(from), new DateTime(to));
+		final VEvent vevent = new VEvent(ruleStart, ruleEnd, "hi");
+
+		vevent.getProperties().add(new RRule(rule));
+
+		if (exceptionDate != null) {
+			vevent.getProperties().add(new ExDate(new DateList(exceptionDate, Value.DATE)));
+		}
+
+		final PeriodList calculated = vevent.calculateRecurrenceSet(period);
+		//noinspection unchecked
+		return TimeSpan.fromIcal(new HashSet<Period>(calculated != null ? calculated : Collections.<Period>emptySet())).toArray(new TimeSpan[calculated.size()]);
+	}
+
+    private static Date calculateStartDate(String start) {
         final java.util.Calendar startCal = java.util.Calendar.getInstance();
+		final Date startDate = parseDate(start);
+		if (startDate == null) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+		startCal.setTime(startDate);
         startCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
         startCal.set(java.util.Calendar.MINUTE, 0);
         startCal.set(java.util.Calendar.SECOND, 0);
@@ -215,6 +306,9 @@ public class MainEndpoint {
         if (date == null || UNTIL_NEVER.equalsIgnoreCase(date)) {
             return null;
         }
+		if (START_TODAY.equalsIgnoreCase(date)) {
+			return new Date();
+		}
         try {
             return DATE_FORMAT.parse(date);
         } catch (ParseException e) {

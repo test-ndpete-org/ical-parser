@@ -28,10 +28,4 @@ public class JsonProvider extends JacksonJsonProvider {
 		mapper.getSerializationConfig().setDateFormat(df);
         setMapper(mapper);
     }
-
-	@Override
-	public void writeTo(Object value, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
-//		super._configuredMapper.getSerializationConfig().getDateFormat().setTimeZone(TimeZone.getTimeZone("America/Denver"));
-		super.writeTo(value, type, genericType, annotations, mediaType, httpHeaders, entityStream);
-	}
 }
