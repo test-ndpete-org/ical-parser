@@ -146,6 +146,7 @@ public class MainEndpoint {
 	 *
 	 * @param feedUrl the URL of the feed to parse.
 	 * @param start starting date for the set which will be returned
+	 * @param offset the period for the returned set will start at 'start + offset'
 	 * @param show period for which to calculate occurrences
 	 * @param until date until which occurrences will be calculated
 	 * @return all events occurring within the specified time frame
@@ -156,6 +157,7 @@ public class MainEndpoint {
     public Event[] parse(
             @QueryParam("feedUrl") URL feedUrl,
 			@QueryParam("start") @DefaultValue(START_TODAY) String start,
+			@QueryParam("offset") @DefaultValue(TimePeriod.ZERO) TimePeriod offset,
             @QueryParam("show") @DefaultValue(DEFAULT_SHOW) TimePeriod show,
             @QueryParam("until") @DefaultValue(UNTIL_NEVER) String until
     ) {
@@ -175,7 +177,7 @@ public class MainEndpoint {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        final Date startDate = calculateStartDate(start);
+        final Date startDate = calculateStartDate(start, offset);
 
         final List<Event> events = filterComponents(calendar.getComponents(), startDate, calculateEndDate(startDate, show, until));
 
@@ -186,6 +188,7 @@ public class MainEndpoint {
 	@Path("/occurrences")
 	public TimeSpan[] calculateOccurrences(
 			@QueryParam("start") @DefaultValue(START_TODAY) String start,
+			@QueryParam("offset") @DefaultValue(TimePeriod.ZERO) TimePeriod offset,
             @QueryParam("show") @DefaultValue(DEFAULT_SHOW) TimePeriod show,
             @QueryParam("until") @DefaultValue(UNTIL_NEVER) String until,
 			@QueryParam("ruleStart") String ruleStart,
@@ -193,7 +196,7 @@ public class MainEndpoint {
 			@QueryParam("rule") String rule,
 			@QueryParam("exceptions") String exceptions) {
 		try {
-			return doCalculateOccurrences(start, show, until, ruleStart, ruleEnd, rule, exceptions);
+			return doCalculateOccurrences(start, offset, show, until, ruleStart, ruleEnd, rule, exceptions);
 		} catch (ParseException e) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
@@ -204,7 +207,7 @@ public class MainEndpoint {
 	@Consumes({"text/json", "application/json"})
 	public TimeSpan[] calculateOccurrences(OccurrencesRequest request) {
 		try {
-			return doCalculateOccurrences(request.getStart(), request.getShow(), request.getUntil(), request.getRuleStart(), request.getRuleEnd(), request.getRule(), request.getExceptions());
+			return doCalculateOccurrences(request.getStart(), request.getOffset(), request.getShow(), request.getUntil(), request.getRuleStart(), request.getRuleEnd(), request.getRule(), request.getExceptions());
 		} catch (ParseException e) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
@@ -213,17 +216,17 @@ public class MainEndpoint {
 	@POST
 	@Path("/occurrences")
 	@Consumes("application/x-www-form-urlencoded")
-	public TimeSpan[] calculateOccurrences(MultivaluedMap<String, String> map) {
+	public TimeSpan[] calculateOccurrencesFromForm(
+			@FormParam("start") @DefaultValue(START_TODAY) String start,
+			@FormParam("offset") @DefaultValue(TimePeriod.ZERO) TimePeriod offset,
+            @FormParam("show") @DefaultValue(DEFAULT_SHOW) TimePeriod show,
+            @FormParam("until") @DefaultValue(UNTIL_NEVER) String until,
+			@FormParam("ruleStart") String ruleStart,
+			@FormParam("ruleEnd") String ruleEnd,
+			@FormParam("rule") String rule,
+			@FormParam("exceptions") String exceptions) {
 		try {
-			return doCalculateOccurrences(
-					map.getFirst("start"),
-					map.containsKey("show") ? TimePeriod.valueOf(map.getFirst("show")) : DEFAULT_SHOW_VALUE,
-					map.getFirst("until"),
-					map.getFirst("ruleStart"),
-					map.getFirst("ruleEnd"),
-					map.getFirst("rule"),
-					map.getFirst("exceptions")
-			);
+			return doCalculateOccurrences(start, offset, show, until, ruleStart, ruleEnd, rule, exceptions);
 		} catch (ParseException e) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
@@ -231,6 +234,7 @@ public class MainEndpoint {
 
 	private static TimeSpan[] doCalculateOccurrences(
 			String start,
+			TimePeriod offset,
 			TimePeriod show,
 			String until,
 			String ruleStartDate,
@@ -238,7 +242,7 @@ public class MainEndpoint {
 			String rule,
 			String exceptionDate
 	) throws ParseException {
-		final Date from = calculateStartDate(start);
+		final Date from = calculateStartDate(start, offset);
 		final Date to = calculateEndDate(from, show, until);
 
 		final DateTime ruleStart = new DateTime(ruleStartDate);
@@ -258,13 +262,16 @@ public class MainEndpoint {
 		return TimeSpan.fromIcal(new HashSet<Period>(calculated != null ? calculated : Collections.<Period>emptySet())).toArray(new TimeSpan[calculated.size()]);
 	}
 
-    private static Date calculateStartDate(String start) {
+    private static Date calculateStartDate(String start, TimePeriod offset) {
         final java.util.Calendar startCal = java.util.Calendar.getInstance();
 		final Date startDate = parseDate(start);
 		if (startDate == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 		startCal.setTime(startDate);
+		if (offset != null) {
+			startCal.add(offset.getUnit().getCalendarField(), offset.getDuration());
+		}
         startCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
         startCal.set(java.util.Calendar.MINUTE, 0);
         startCal.set(java.util.Calendar.SECOND, 0);
