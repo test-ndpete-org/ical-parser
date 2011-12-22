@@ -202,10 +202,12 @@ public class MainEndpoint {
 		}
 	}
 
-	@POST
-	@Path("/occurrences")
-	@Consumes({"text/json", "application/json"})
+//	@POST
+//	@Path("/occurrences")
+//	@Consumes({"text/json", "application/json"})
+	// Ignore this method, as json deserialization doesn't seem to work
 	public TimeSpan[] calculateOccurrences(OccurrencesRequest request) {
+		LOG.debug("Got calculate occurrences request: " + request);
 		try {
 			return doCalculateOccurrences(request.getStart(), request.getOffset(), request.getShow(), request.getUntil(), request.getRuleStart(), request.getRuleEnd(), request.getRule(), request.getExceptions());
 		} catch (ParseException e) {
@@ -242,6 +244,16 @@ public class MainEndpoint {
 			String rule,
 			String exceptionDate
 	) throws ParseException {
+		LOG.debug(String.format("Calculating occurrences with args:%n" +
+				"start = '%s'%n" +
+				"offset = '%s'%n" +
+				"show='%s'%n"+
+				"until='%s'%n" +
+				"ruleStartDate='%s'%n" +
+				"ruleEndDate='%s'%n" +
+				"rule='%s'%n" +
+				"exceptionDate='%s'", start, offset, show, until, ruleStartDate, ruleEndDate, rule, exceptionDate));
+
 		final Date from = calculateStartDate(start, offset);
 		final Date to = calculateEndDate(from, show, until);
 
