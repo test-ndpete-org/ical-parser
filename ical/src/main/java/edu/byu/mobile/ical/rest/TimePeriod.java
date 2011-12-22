@@ -11,14 +11,13 @@ import java.util.Calendar;
  * @author jmooreoa
  */
 public class TimePeriod {
-    private static final Logger LOG = Logger.getLogger(TimePeriod.class);
-
     private static final MessageFormat EXTERNAL_FORM = new MessageFormat("{0,number,integer}{1}");
 
     private final int duration;
     private final TimeUnit unit;
+	public static final String ZERO = "0";
 
-    public TimePeriod(int duration, TimeUnit unit) {
+	public TimePeriod(int duration, TimeUnit unit) {
         this.duration = duration;
         this.unit = unit;
     }
@@ -59,6 +58,9 @@ public class TimePeriod {
     }
 
     public static TimePeriod valueOf(String value) {
+		if (value.startsWith(ZERO)) {
+			return null;
+		}
         Object[] parsed;
         try {
             parsed = EXTERNAL_FORM.parse(value);

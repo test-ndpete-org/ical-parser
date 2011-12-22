@@ -7,12 +7,21 @@ import java.util.Date;
  */
 public class OccurrencesRequest {
 	private String start;
+	private TimePeriod offset;
 	private TimePeriod show;
 	private String until;
 	private String ruleStart;
 	private String ruleEnd;
 	private String rule;
 	private String exceptions;
+
+	public TimePeriod getOffset() {
+		return offset;
+	}
+
+	public void setOffset(TimePeriod offset) {
+		this.offset = offset;
+	}
 
 	public String getStart() {
 		return start;
