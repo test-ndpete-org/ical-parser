@@ -1,10 +1,12 @@
 package edu.byu.mobile.ical.rest;
 
-import java.util.Date;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonMethod;
 
 /**
  * @author jmooreoa
  */
+@JsonAutoDetect(value = JsonMethod.FIELD)
 public class OccurrencesRequest {
 	private String start;
 	private TimePeriod offset;
@@ -77,5 +79,21 @@ public class OccurrencesRequest {
 
 	public void setExceptions(String exceptions) {
 		this.exceptions = exceptions;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("OccurrencesRequest");
+		sb.append("{start='").append(start).append('\'');
+		sb.append(", offset=").append(offset);
+		sb.append(", show=").append(show);
+		sb.append(", until='").append(until).append('\'');
+		sb.append(", ruleStart='").append(ruleStart).append('\'');
+		sb.append(", ruleEnd='").append(ruleEnd).append('\'');
+		sb.append(", rule='").append(rule).append('\'');
+		sb.append(", exceptions='").append(exceptions).append('\'');
+		sb.append('}');
+		return sb.toString();
 	}
 }
