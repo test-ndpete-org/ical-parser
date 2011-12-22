@@ -19,7 +19,7 @@ public class TimeSpan implements Comparable<TimeSpan> {
         this.allDay = allDay;
     }
 
-    private TimeSpan(final Period period) {
+    public TimeSpan(final Period period) {
         start = period.getStart() == null ? null : new Date(period.getStart().getTime());
         end = period.getEnd() == null ? null : new Date(period.getEnd().getTime());
 		final Dur dur = period.getDuration();
