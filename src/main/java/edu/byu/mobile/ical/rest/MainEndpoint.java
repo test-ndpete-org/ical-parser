@@ -91,10 +91,17 @@ public class MainEndpoint {
 	 * <pre>[
 	 * {
 	 * 	"uid":"000000013300@calendar.byu.edu",
+	 * 	"summary":"New Year's Day Holiday",
 	 * 	"allDay":false,
+	 * 	"startDate":"2012-01-02T07:00:00.000+0000",
 	 * 	"endDate":"2012-01-03T06:00:00.000+0000",
-	 * 	"repeatRule":"FREQ=YEARLY;INTERVAL=1",
-	 * 	"repeatExceptionDate":null,
+	 * 	"repeats":true,
+	 * 	"repeatRule": {
+	 *		"rule": "FREQ=YEARLY;INTERVAL=1",
+	 *		"firstOccurrenceEnd": "20110101T000000",
+	 *		"firstOccurrenceStart": "20110101T235959",
+	 *		"exceptions": null
+	 *	},
 	 * 	"modified":null,
 	 * 	"occurrences":[
 	 * 		{
@@ -105,20 +112,20 @@ public class MainEndpoint {
 	 * 	],
 	 * 	"description":null,
 	 * 	"location":null,
-	 * 	"url":"http://calendar.byu.edu/content/new-years-day-holiday",
-	 * 	"summary":"New Year's Day Holiday",
-	 * 	"startDate":"2012-01-02T07:00:00.000+0000"
+	 * 	"url":"http://calendar.byu.edu/content/new-years-day-holiday"
 	 * }
 	 * ]</pre>
-	 * <p/>
+	 * <br /><b>Please note that these fields may not appear in this exact order.</b><br />
 	 * <h4>Description of fields:</h4>
 	 * <table>
 	 * <tr><th>name</th><th>type</th><th>nullable?</th><th>description</th></tr>
 	 * <tr><td>uid</td><td>string</td><td>no</td><td>the iCal uid of this event</td></tr>
+	 * <tr><td>summary</td><td>string</td><td>yes</td><td>summary/name of the event</td></tr>
 	 * <tr><td>allDay</td><td>boolean</td><td>no</td><td>true if the event is an all-day event.</td></tr>
+	 * <tr><td>startDate</td><td>date</td><td>no</td><td>start date/time of the first occurrence of the event</td></tr>
 	 * <tr><td>endDate</td><td>date</td><td>no</td><td>end date/time of the first occurrence this event</td></tr>
-	 * <tr><td>repeatRule</td><td>string</td><td>yes</td><td>An exact copy of the contents of the iCal event's 'RRULE' field</td></tr>
-	 * <tr><td>repeatExceptionDate</td><td>string</td><td>yes</td><td>An exact copy of the contents of the iCal event's 'EXDATE' field</td></tr>
+	 * <tr><td>repeats</td><td>boolean</td><td>no</td><td>true if the event repeats.</td></tr>
+	 * <tr><td>repeatRule</td><td>object</td><td>yes</td><td>iCal repeat rule information.</td></tr>
 	 * <tr><td>modified</td><td>date</td><td>yes</td><td>the date that this event was last modified</td></tr>
 	 * <tr><td>occurrences</td><td>array</td><td>no</td>
 	 * <td>
@@ -134,8 +141,6 @@ public class MainEndpoint {
 	 * <tr><td>description</td><td>string</td><td>yes</td><td>description of the event</td></tr>
 	 * <tr><td>location</td><td>string</td><td>yes</td><td>location of the event</td></tr>
 	 * <tr><td>url</td><td>string</td><td>yes</td><td>a url containing more information about the event</td></tr>
-	 * <tr><td>summary</td><td>string</td><td>yes</td><td>summary/name of the event</td></tr>
-	 * <tr><td>startDAte</td><td>date</td><td>no</td><td>start date/time of the first occurrence of the event</td></tr>
 	 * </table>
 	 * <br />
 	 * All dates are in ISO-8601 notation, in which the beginning of the Unix Epoch would be formatted "1970-01-01T00:00:00.000+0000".
@@ -230,6 +235,7 @@ public class MainEndpoint {
 		}
 	}
 
+	@SuppressWarnings({"unchecked"})
 	private static TimeSpan[] doCalculateOccurrences(
 			String start,
 			TimePeriod offset,
@@ -266,8 +272,10 @@ public class MainEndpoint {
 		}
 
 		final PeriodList calculated = vevent.calculateRecurrenceSet(period);
-		//noinspection unchecked
-		return TimeSpan.fromIcal(new HashSet<Period>(calculated != null ? calculated : Collections.<Period>emptySet())).toArray(new TimeSpan[calculated.size()]);
+		if (calculated == null || calculated.isEmpty()) {
+			return new TimeSpan[0];
+		}
+		return TimeSpan.fromIcal(new HashSet<Period>(calculated)).toArray(new TimeSpan[calculated.size()]);
 	}
 
 	private static Date calculateStartDate(String start, TimePeriod offset) {
