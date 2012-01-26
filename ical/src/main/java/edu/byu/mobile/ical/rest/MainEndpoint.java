@@ -40,10 +40,14 @@ public class MainEndpoint {
 	 * <p/>
 	 * <h3>Parameters</h3>
 	 * 'feedUrl' is required.<br />
+	 * 'start' is the first date for which events will be shown. It is optional and defaults to 'today'.  It must be in
+	 * the form 'yyy-MM-dd'<br />
+	 * 'offset' offsets the first date for which events will be shown by a specified amount. It is optional and defaults
+	 * to '0'..
 	 * 'show' and 'until' are both optional.  If neither is specified, 'show' defaults to '3MO'.
 	 * If 'until' is specified, the value of 'show' is ignored.<br />
 	 * <br />
-	 * 'show' must be in the form of a positive integer, followed by one of the following:
+	 * 'show' and 'offset' must be in the form of a positive integer, followed by one of the following:
 	 * <dl>
 	 * <li>D (day)</li>
 	 * <li>WK (week)</li>
@@ -173,7 +177,7 @@ public class MainEndpoint {
 		try {
 			calendar = builder.build(feedUrl.openStream());
 		} catch (IOException e) {
-			throw new WebApplicationException(Response.Status.NOT_FOUND);
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		} catch (ParserException e) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
@@ -185,6 +189,20 @@ public class MainEndpoint {
 		return events.toArray(new Event[events.size()]);
 	}
 
+	/**
+	 * Calculates the occurrences of a given repeat pattern.<br />
+	 * The 'start', 'offset', 'show', and 'until' parameters match their definitions in {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}.
+	 *
+	 * @param start same as {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}
+	 * @param offset same as {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}
+	 * @param show same as {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}
+	 * @param until same as {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}
+	 * @param ruleStart Start date/time of the event.  Should be in the ical date format.
+	 * @param ruleEnd End date/time of the event.  Should be in ical date format.
+	 * @param rule Rule the ical repeat rule.
+	 * @param exceptions The ical EXDATE value.
+	 * @return All occurrences for the specified event in the specified date range.
+	 */
 	@GET
 	@Path("/occurrences")
 	public TimeSpan[] calculateOccurrences(
@@ -203,19 +221,20 @@ public class MainEndpoint {
 		}
 	}
 
-	//	@POST
-//	@Path("/occurrences")
-//	@Consumes({"text/json", "application/json"})
-	// Ignore this method, as json deserialization doesn't seem to work
-	public TimeSpan[] calculateOccurrences(OccurrencesRequest request) {
-		LOG.debug("Got calculate occurrences request: " + request);
-		try {
-			return doCalculateOccurrences(request.getStart(), request.getOffset(), request.getShow(), request.getUntil(), request.getRuleStart(), request.getRuleEnd(), request.getRule(), request.getExceptions());
-		} catch (ParseException e) {
-			throw new WebApplicationException(Response.Status.BAD_REQUEST);
-		}
-	}
-
+	/**
+	 * Calculates the occurrences of a given repeat pattern.<br />
+	 * The 'start', 'offset', 'show', and 'until' parameters match their definitions in {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}.
+	 *
+	 * @param start same as {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}
+	 * @param offset same as {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}
+	 * @param show same as {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}
+	 * @param until same as {@link #parse(java.net.URL, String, TimePeriod, TimePeriod, String)}
+	 * @param ruleStart Start date/time of the event.  Should be in the ical date format.
+	 * @param ruleEnd End date/time of the event.  Should be in ical date format.
+	 * @param rule Rule the ical repeat rule.
+	 * @param exceptions The ical EXDATE value.
+	 * @return All occurrences for the specified event in the specified date range.
+	 */
 	@POST
 	@Path("/occurrences")
 	@Consumes("application/x-www-form-urlencoded")
