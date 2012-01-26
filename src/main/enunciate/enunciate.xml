@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<enunciate
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.24.xsd">
+    <deployment protocol="https" host="ws.byu.edu" context="services/ical"/>
+    <services>
+        <rest defaultRestSubcontext="/rest/v1/">
+			<content-types>
+				<content-type type="application/json" id="application-json"/>
+				<content-type type="text/json" id="text-json"/>
+			</content-types>
+        </rest>
+    </services>
+    <modules>
+        <docs copyright="2011 Brigham Young University Office of Information Technology">
+        </docs>
+    </modules>
+</enunciate>
