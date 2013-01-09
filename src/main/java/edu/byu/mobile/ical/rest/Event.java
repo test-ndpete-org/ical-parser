@@ -3,6 +3,8 @@ package edu.byu.mobile.ical.rest;
 import net.fortuna.ical4j.model.PeriodList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.DateProperty;
+import net.fortuna.ical4j.model.property.Duration;
 
 import java.util.Collections;
 import java.util.Date;
@@ -37,8 +39,9 @@ public class Event {
 		if (event.getUid() != null)
 			this.uid = event.getUid().getValue();
 
-		final Date eventStartDate = event.getStartDate().getDate();
-		final Date eventEndDate = event.getEndDate(event.getDuration() != null && event.getDuration().getValue() != null).getDate();
+		final Date eventStartDate = nullSafeDate(event.getStartDate());
+		final Duration duration = event.getDuration();
+		final Date eventEndDate = nullSafeDate(event.getEndDate(duration != null && duration.getValue() != null));
 
 		if (occurrences != null && !occurrences.isEmpty()) {
 			this.occurrences = TimeSpan.fromIcal(occurrences);
@@ -199,5 +202,10 @@ public class Event {
 		sb.append(", repeatRule=").append(repeatRule);
 		sb.append('}');
 		return sb.toString();
+	}
+
+	private static Date nullSafeDate(final DateProperty o) {
+		if (o == null) return null;
+		return o.getDate();
 	}
 }

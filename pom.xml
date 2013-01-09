@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.byu.mobile.ical</groupId>
 	<artifactId>ical-parser-rest</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>iCal Parsing Rest Service</name>
 	<packaging>war</packaging>
 	<url>http://www.byu.edu</url>
@@ -11,16 +11,15 @@
 	<parent>
 		<groupId>edu.byu</groupId>
 		<artifactId>byu-framework-pom</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.3</version>
 	</parent>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/glassfish/</url>
-		</pluginRepository>
-	</pluginRepositories>
+	<properties>
+		<ehcache.version>2.4.6</ehcache.version>
+		<log4j.version>1.2.16</log4j.version>
+		<jersey.version>1.0.3.1</jersey.version>
+		<jackson.version>1.5.0</jackson.version>
+	</properties>
 
 	<developers>
 		<developer>
@@ -74,8 +73,6 @@
 		<dependency>
 			<groupId>org.mnode.ical4j</groupId>
 			<artifactId>ical4j</artifactId>
-			<version>1.0.2</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -99,6 +96,7 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>2010.06.01</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
@@ -106,25 +104,67 @@
 			<version>2.0.4</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+			<version>${ehcache.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
 	</dependencies>
 
-	<properties>
-		<log4j.version>1.2.16</log4j.version>
-		<jersey.version>1.0.3.1</jersey.version>
-		<jackson.version>1.5.0</jackson.version>
-	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.mnode.ical4j</groupId>
+				<artifactId>ical4j</artifactId>
+				<version>1.0.4</version>
+				<scope>compile</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/glassfish/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<build>
-		<finalName>ical-parsing-rest</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
-				<version>6.1.10</version>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>7.4.2.v20110526</version>
 				<configuration>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
 					<stopKey>foo</stopKey>
 					<stopPort>9999</stopPort>
+					<systemProperties>
+						<systemProperty>
+							<name>byu.logdir</name>
+							<value>${tmpdir}</value>
+						</systemProperty>
+						<systemProperty>
+							<name>byu.app.stage</name>
+							<value>dev</value>
+						</systemProperty>
+					</systemProperties>
 				</configuration>
 				<executions>
 					<execution>
@@ -201,7 +241,7 @@
 						<artifactId>tools</artifactId>
 						<version>1.4.2</version>
 						<scope>system</scope>
-						<systemPath>${java.home}/../lib/tools.jar</systemPath>
+						<systemPath>${jdk.tools.jar.location}</systemPath>
 					</dependency>
 					<dependency>
 						<groupId>org.codehaus.enunciate</groupId>
@@ -214,6 +254,13 @@
 						<version>1.24</version>
 					</dependency>
 				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<skipExec>true</skipExec>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

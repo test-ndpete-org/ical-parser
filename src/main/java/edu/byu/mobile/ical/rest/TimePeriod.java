@@ -1,10 +1,7 @@
 package edu.byu.mobile.ical.rest;
 
-import org.apache.log4j.Logger;
-
 import java.text.MessageFormat;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.util.Calendar;
 
 /**
