@@ -1,6 +1,7 @@
 package edu.byu.mobile.ical.rest;
 
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.DateProperty;
 
 /**
  * @author jmooreoa
@@ -12,8 +13,8 @@ public class RepeatRule {
 	private String exceptions;
 
 	public RepeatRule(VEvent event) {
-		this.firstOccurrenceStart = event.getStartDate().getValue();
-		this.firstOccurrenceEnd = event.getEndDate(event.getDuration() != null && event.getDuration().getValue() != null).getValue();
+		this.firstOccurrenceStart = nullSafeString(event.getStartDate());
+		this.firstOccurrenceEnd = nullSafeString(event.getEndDate(event.getDuration() != null && event.getDuration().getValue() != null));
 		if (event.getProperty("RRULE") != null) {
 			this.rule = event.getProperty("RRULE").getValue();
 		}
@@ -52,5 +53,10 @@ public class RepeatRule {
 
 	public void setExceptions(String exceptions) {
 		this.exceptions = exceptions;
+	}
+
+	private static String nullSafeString(final DateProperty o) {
+		if (o == null) return null;
+		return o.getValue();
 	}
 }

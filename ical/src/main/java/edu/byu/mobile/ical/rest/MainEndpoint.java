@@ -12,13 +12,15 @@ import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Path("/")
 @Produces({"application/json", "text/json"})
@@ -34,6 +36,8 @@ public class MainEndpoint {
 
 	public static final TimePeriod DEFAULT_SHOW_VALUE = TimePeriod.valueOf(DEFAULT_SHOW);
 	private static final String START_TODAY = "today";
+
+	private static final boolean isInProd = System.getProperty("byu.app.stage") != null && "prod".equalsIgnoreCase(System.getProperty("byu.app.stage"));
 
 	/**
 	 * Parses the given iCal feed and returns it as an array of JSON events.<br /><br />
@@ -175,7 +179,12 @@ public class MainEndpoint {
 
 		final Calendar calendar;
 		try {
-			calendar = builder.build(feedUrl.openStream());
+			final String lowerFeedUrl = feedUrl.toString().toLowerCase();
+			if (lowerFeedUrl.contains("calendar.byu.edu/ical") || lowerFeedUrl.contains("calendar.byu.edu/calendar/ical") || (!isInProd && lowerFeedUrl.startsWith("file:"))) {
+				calendar = builder.build(correctStream(feedUrl.openStream()));
+			} else {
+				calendar = builder.build(feedUrl.openStream());
+			}
 		} catch (IOException e) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		} catch (ParserException e) {
@@ -356,5 +365,78 @@ public class MainEndpoint {
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Unable to parse date " + date, e);
 		}
+	}
+
+	private static final String BEGIN_VTIMEZONE = "BEGIN:VTIMEZONE";
+	private static final String BEGIN_DAYLIGHT = "BEGIN:DAYLIGHT";
+	private static final String BEGIN_STANDARD = "BEGIN:STANDARD";
+	private static final String END_DAYLIGHT = "END:DAYLIGHT";
+	private static final String END_STANDARD = "END:STANDARD";
+	private static final String END_VTIMEZONE = "END:VTIMEZONE";
+	private static final String BEGIN_EVENT = "BEGIN:VEVENT";
+	private static final String END_EVENT = "END:VEVENT";
+	private static final String START_DATE = "DTSTART;";
+	private static final String END_DATE = "DTEND;";
+	private static final String DATE_QUAL = "DATE:";
+	private static final String DATE_TIME_QUAL = "DATE-TIME:";
+	private static final String TIME_ZONE = "TZID=";
+	private static final Pattern DATE_TIME_PTN = Pattern.compile("^.*?(\\d{8}T\\d{6}).*?$");
+	private static final Pattern DATE_ONLY_PTN = Pattern.compile("^.*?(\\d{8}).*?$");
+
+	private static Reader correctStream(final InputStream inputStream) throws IOException {
+		final BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+		final StringBuilder sb = new StringBuilder(4096);
+
+		boolean[] flags = {false, false, false, false};//[in header, in body, in dst, in event]
+
+		String line;
+		while ((line = in.readLine()) != null) {
+			if (line.equals(BEGIN_VTIMEZONE)) {
+				flags[0] = true;
+			} else if (line.equals(END_VTIMEZONE)) {
+				flags[0] = false;
+			} else if (line.equals(BEGIN_DAYLIGHT) || line.equals(BEGIN_STANDARD)) {
+				flags[2] = true;
+			} else if (line.equals(END_DAYLIGHT) || line.equals(END_STANDARD)) {
+				flags[2] = false;
+			} else if (line.equals(BEGIN_EVENT)) {
+				flags[3] = true;
+			} else if (line.equals(END_EVENT)) {
+				flags[3] = false;
+			}
+			if (flags[0] && flags[2]) {//in a definition of TZ for standard or DS time, check for date only and correct to date time
+				final Matcher dtm = DATE_TIME_PTN.matcher(line);
+				final Matcher dom = DATE_ONLY_PTN.matcher(line);
+				if (line.startsWith(START_DATE) && !line.contains(DATE_TIME_QUAL) && !dtm.matches() && dom.matches()) {
+						final String date = dom.group(1);
+						sb.append(START_DATE);
+						sb.append("VALUE=");
+						sb.append(DATE_TIME_QUAL);
+						sb.append(date);
+						sb.append("T000000");
+				} else {
+					sb.append(line);
+				}
+			} else if (!flags[0] && flags[3]) {//in an event definition, check for date only
+				final Matcher dtm = DATE_TIME_PTN.matcher(line);
+				final Matcher dom = DATE_ONLY_PTN.matcher(line);
+				final boolean a = line.startsWith(START_DATE);
+				final boolean b = line.startsWith(END_DATE);
+				if ((a || b) && !line.contains(DATE_TIME_QUAL) && !dtm.matches() && dom.matches()) {
+					final String date = dom.group(1);
+					sb.append(a ? START_DATE : END_DATE);
+					sb.append("VALUE=");
+					sb.append(DATE_TIME_QUAL);
+					sb.append(date);
+					sb.append("T000000");
+				} else {
+					sb.append(line);
+				}
+			} else {
+				sb.append(line);
+			}
+			sb.append("\r\n");
+		}
+		return new StringReader(sb.toString());
 	}
 }
