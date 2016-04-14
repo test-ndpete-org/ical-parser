@@ -148,78 +148,96 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>7.4.2.v20110526</version>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
 				<configuration>
-					<scanIntervalSeconds>10</scanIntervalSeconds>
-					<stopKey>foo</stopKey>
-					<stopPort>9999</stopPort>
+					<port>8080</port>
+					<path>/ical-parser</path>
+					<httpsPort>8443</httpsPort>
+					<keystoreFile>${project.build.outputDirectory}/tomcat7-ssl.keystore</keystoreFile>
+					<keystorePass>tomcat7pass</keystorePass>
 					<systemProperties>
-						<systemProperty>
-							<name>byu.logdir</name>
-							<value>${tmpdir}</value>
-						</systemProperty>
-						<systemProperty>
-							<name>byu.app.stage</name>
-							<value>dev</value>
-						</systemProperty>
+						<byu.logdir>${project.build.directory}</byu.logdir>
+						<byu.app.stage>dev</byu.app.stage>
+						<spring.profiles.active>local</spring.profiles.active>
 					</systemProperties>
+					<!--<contextFile>${project.basedir}/src/main/resources/local-tomcat.xml</contextFile>-->
 				</configuration>
-				<executions>
-					<execution>
-						<id>start-jetty</id>
-						<!--<phase>pre-integration-test</phase>-->
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<scanIntervalSeconds>0</scanIntervalSeconds>
-							<daemon>true</daemon>
-						</configuration>
-					</execution>
-					<execution>
-						<id>stop-jetty</id>
-						<!--<phase>post-integration-test</phase>-->
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
 				<dependencies>
 					<dependency>
-						<groupId>org.codehaus.jackson</groupId>
-						<artifactId>jackson-jaxrs</artifactId>
-						<version>${jackson.version}</version>
-						<scope>runtime</scope>
+						<groupId>commons-dbcp</groupId>
+						<artifactId>commons-dbcp</artifactId>
+						<version>1.4</version>
 					</dependency>
 					<dependency>
-						<groupId>org.codehaus.jackson</groupId>
-						<artifactId>jackson-core-asl</artifactId>
-						<version>${jackson.version}</version>
-						<scope>runtime</scope>
+						<groupId>edu.byu.jdbc</groupId>
+						<artifactId>byuSecureDriver</artifactId>
+						<version>2.0.0</version>
 					</dependency>
 					<dependency>
-						<groupId>org.codehaus.jackson</groupId>
-						<artifactId>jackson-mapper-asl</artifactId>
-						<version>${jackson.version}</version>
-						<scope>runtime</scope>
-					</dependency>
-					<dependency>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-server</artifactId>
-						<version>${jersey.version}</version>
-						<scope>runtime</scope>
-					</dependency>
-					<dependency>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-core</artifactId>
-						<version>${jersey.version}</version>
-						<scope>runtime</scope>
+						<groupId>com.oracle</groupId>
+						<artifactId>ojdbc7</artifactId>
+						<version>12.1.0.2</version>
 					</dependency>
 				</dependencies>
 			</plugin>
+
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>keytool-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>clean</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+					<execution>
+						<phase>generate-resources</phase>
+						<id>genKey</id>
+						<goals>
+							<goal>generateKeyPair</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>${project.build.outputDirectory}/tomcat7-ssl.keystore</keystore>
+					<dname>cn=localhost.byu.edu</dname>
+					<keypass>tomcat7pass</keypass>
+					<storepass>tomcat7pass</storepass>
+					<alias>tom7</alias>
+					<keyalg>RSA</keyalg>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<property>
+							<name>javax.net.ssl.keyStore</name>
+							<value>${project.build.outputDirectory}/tomcat7-ssl.keystore</value>
+						</property>
+						<property>
+							<name>javax.net.ssl.keyStorePassword</name>
+							<value>tomcat7pass</value>
+						</property>
+						<property>
+							<name>javax.net.ssl.trustStore</name>
+							<value>${project.build.outputDirectory}/tomcat7-ssl.keystore</value>
+						</property>
+						<property>
+							<name>javax.net.ssl.trustStorePassword</name>
+							<value>tomcat7pass</value>
+						</property>
+					</systemProperties>
+				</configuration>
+			</plugin>
+
+<!--			<plugin>
 				<groupId>org.codehaus.enunciate</groupId>
 				<artifactId>maven-enunciate-plugin</artifactId>
 				<version>1.24</version>
@@ -254,7 +272,8 @@
 						<version>1.24</version>
 					</dependency>
 				</dependencies>
-			</plugin>
+			</plugin>-->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
