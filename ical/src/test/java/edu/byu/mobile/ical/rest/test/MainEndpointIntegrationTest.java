@@ -100,6 +100,8 @@ public class MainEndpointIntegrationTest extends JerseyTest {
         clearTimePortion(cal);
         for (int i = 0; i <= 52; i++) {
             cal.add(Calendar.WEEK_OF_YEAR, 1);
+            //Midnight next week is the start of the next recurrence, so need to go back one moment to not include in test case
+            cal.add(Calendar.MILLISECOND,-1);
             testRecurring(cal.getTime());
         }
     }

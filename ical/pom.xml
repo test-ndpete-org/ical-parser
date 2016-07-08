@@ -153,7 +153,7 @@
 				<version>2.2</version>
 				<configuration>
 					<port>8080</port>
-					<path>/ical-parser</path>
+					<path>/services/ical-parser</path>
 					<httpsPort>8443</httpsPort>
 					<keystoreFile>${project.build.outputDirectory}/tomcat7-ssl.keystore</keystoreFile>
 					<keystorePass>tomcat7pass</keystorePass>
