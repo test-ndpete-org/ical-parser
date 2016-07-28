@@ -1,0 +1,46 @@
+{	
+	"CMDB":{
+		"Software":{
+			"Name":"ical-parser",
+			"Alias":"",
+			"Short Description":"iCal parsing rest service is a restful web service that takes an ical URL as an input and returns a json formated calendar",
+			"Type":"Web Service",
+			"Microservice":true,
+			"URL":"http://ws.byu.edu/services/ical-parser/",
+			"Download File Location":"",
+			"Status":"Production",
+			"Hosting Location":"AWS",
+			"AWS Account ID":"",
+			"Availability Zones":"",
+			"Cloud Platform":"ECS",
+			"Tags":[
+				"",
+				""
+			],
+			"Source Repo URL":"https://github.com/byu-oit-appdev/ical-parser",
+			"Technologies Used":[
+				"Java",
+				"Jersey"
+			],
+			"Federation JSON URL":"<URL>"
+		},
+		"Relationships":{
+			"Supports": [
+				"Application Development",
+				"BYU Mobile Application"
+			],
+			"DB Read Only": [
+			],
+			"DB Read/Write": [
+			],
+			"Depends On": [
+			],
+			"Reverse Proxy": "nautilus",
+			"Runs On": "nano",
+			"Developed By": [
+				"jmooreoa",
+				"tgengler"
+			]
+		}
+	}
+}
