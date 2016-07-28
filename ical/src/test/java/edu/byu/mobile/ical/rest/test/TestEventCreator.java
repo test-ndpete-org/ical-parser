@@ -98,10 +98,37 @@ public abstract class TestEventCreator {
 
     private static VEvent generateAllDayRecurringEvent(Date start, Recur rule, Date... exceptions) throws URISyntaxException, UnsupportedEncodingException {
         VEvent event = generateRecurringEvent(start, rule, exceptions);
-        event.getStartDate().setDate(new net.fortuna.ical4j.model.Date(start));
-        event.getProperties().remove(event.getEndDate());
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTime(start);
+
+        DateTime endDateTime = maxOut(cal);
+        DateTime startDateTime = bottomOut(cal);
+
+        event.getStartDate().setDate(new net.fortuna.ical4j.model.DateTime(startDateTime));
+        event.getEndDate().setDate(new net.fortuna.ical4j.model.DateTime(endDateTime));
+
+        if(event.getDuration() != null)
+         event.getDuration().setDuration(new net.fortuna.ical4j.model.Dur(startDateTime,endDateTime));
 
         return event;
+    }
+
+    private static DateTime bottomOut (java.util.Calendar cal) {
+        //Sets the time to midnight
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        cal.set(java.util.Calendar.MINUTE, 0);
+        cal.set(java.util.Calendar.SECOND, 0);
+        cal.set(java.util.Calendar.MILLISECOND, 0);
+        return new DateTime(cal.getTime());
+    }
+
+    private static DateTime maxOut(java.util.Calendar cal) {
+        //Sets the time to one second before midnight, needed for creating an all day event (Refer to TimeSpans constructor)
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 23);
+        cal.set(java.util.Calendar.MINUTE, 59);
+        cal.set(java.util.Calendar.SECOND, 59);
+        cal.set(java.util.Calendar.MILLISECOND, 59);
+        return new DateTime(cal.getTime());
     }
 
     private static VEvent generateOneShotEvent(Date day) throws URISyntaxException, UnsupportedEncodingException {

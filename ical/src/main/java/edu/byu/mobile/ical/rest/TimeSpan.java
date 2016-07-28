@@ -1,5 +1,6 @@
 package edu.byu.mobile.ical.rest;
 
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Period;
 
@@ -9,20 +10,20 @@ import java.util.*;
  * @author jmooreoa
  */
 public class TimeSpan implements Comparable<TimeSpan> {
-    private final Date start;
-    private final Date end;
+    private final DateTime start;
+    private final DateTime end;
     private final boolean allDay;
 
     public TimeSpan(Date start, Date end, boolean allDay) {
-        this.start = start;
-        this.end = end;
+        this.start = new DateTime(start);
+        this.end = new DateTime(end);
         this.allDay = allDay;
     }
 
     public TimeSpan(final Period period) {
-        start = period.getStart() == null ? null : new Date(period.getStart().getTime());
-        end = period.getEnd() == null ? null : new Date(period.getEnd().getTime());
-		final Dur dur = period.getDuration();
+        start = period.getStart() == null ? null : new DateTime(period.getStart().getTime());
+        end = period.getEnd() == null ? null : new DateTime(period.getEnd().getTime());
+        final Dur dur = new Dur(start,end);
         allDay = dur.getDays() == 0 && dur.getHours() == 23 && dur.getMinutes() == 59 && dur.getSeconds() == 59;
     }
 
