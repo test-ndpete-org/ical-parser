@@ -1,0 +1,132 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters" : {
+    "ImageTag" : {
+      "Description" : "The image tag to deploy to the ecs cluster",
+      "Type" : "String",
+      "Default" : "latest"
+    }
+  },
+  "Resources": {
+    "task": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Cpu" : 512,
+            "Essential" : true,
+            "Image" : { "Fn::Join" : ["", ["quay.io/byuoit/ical2json:", { "Ref" : "ImageTag" }]]},
+            "Memory" : 256,
+            "Name" : "ical2json",
+            "PortMappings" : [
+              {
+                "ContainerPort" : 8080,
+                "HostPort" : 5003
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "service": {
+      "Type" : "AWS::ECS::Service",
+      "Properties" : {
+        "Cluster" : "arn:aws:ecs:us-west-2:818272543125:cluster/default",
+        "DesiredCount" : 2,
+        "LoadBalancers" : [
+          {
+            "ContainerName" : "ical2json",
+            "ContainerPort" : 8080,
+            "LoadBalancerName" : "elb-ical2json"
+          }
+        ],
+        "Role" : "arn:aws:iam::818272543125:role/ecsServiceRole",
+        "TaskDefinition" : {
+          "Ref" : "task"
+        }
+      },
+      "DependsOn" : "elb"
+    },
+    "elb" : {
+      "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties" : {
+        "ConnectionDrainingPolicy" : {
+          "Enabled" : true,
+          "Timeout" : 400
+        },
+        "ConnectionSettings" : {
+          "IdleTimeout" : 400
+        },
+        "CrossZone" : true,
+        "HealthCheck" : {
+          "HealthyThreshold" : "2",
+          "Interval" : "30",
+          "Target" : "HTTP:5003/",
+          "Timeout" : "3",
+          "UnhealthyThreshold" : "2"
+        },
+        "LoadBalancerName" : "elb-ical2json",
+        "Listeners" : [
+          {
+            "InstancePort" : "5003",
+            "InstanceProtocol" : "HTTP",
+            "LoadBalancerPort" : "443",
+            "Protocol" : "HTTPS",
+            "SSLCertificateId" : "arn:aws:iam::818272543125:server-certificate/star_devops_byu_edu"
+          }
+        ],
+        "Scheme" : "internet-facing",
+        "Subnets" : [
+          "subnet-816a82e5",
+          "subnet-e6696591"
+        ],
+        "SecurityGroups" : [{
+          "Ref" : "sgElb"
+        }]
+      }
+    },
+    "sgElb" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Security group for the ELB for this demo app",
+        "SecurityGroupIngress" : [ {
+          "IpProtocol" : "tcp",
+          "FromPort" : 443,
+          "ToPort" : 443,
+          "CidrIp" : "0.0.0.0/0"
+        } ],
+        "SecurityGroupEgress" : [ {
+          "IpProtocol" : "tcp",
+          "FromPort" : 0,
+          "ToPort" : 65535,
+          "CidrIp" : "0.0.0.0/0"
+        }],
+        "VpcId" : "vpc-5e896f3a"
+      }
+    },
+    "sg" : {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol" : "tcp",
+        "FromPort" : 5003,
+        "ToPort" : 5003,
+        "CidrIp" : "0.0.0.0/0",
+        "GroupId" : "sg-8cdd79eb"
+      }
+    },
+    "dns" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties" : {
+        "HostedZoneName" : "devops.byu.edu.",
+        "Name" : "ical2json.devops.byu.edu.",
+        "Type" : "A",
+        "AliasTarget" : {
+          "DNSName" : {"Fn::GetAtt" : ["elb", "DNSName"]},
+          "EvaluateTargetHealth" : false,
+          "HostedZoneId" : "Z1H1FL5HABSF5"
+        }
+      },
+      "DependsOn" : "elb"
+    }
+  }
+}
