@@ -146,6 +146,7 @@
 	</pluginRepositories>
 
 	<build>
+		<finalName>ical</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
@@ -300,6 +301,48 @@
 				<configuration>
 					<skipExec>true</skipExec>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.4.11</version>
+				<configuration>
+					<imageName>ical2json</imageName>
+					<dockerDirectory>${project.basedir}</dockerDirectory>
+					<forceTags>true</forceTags>
+					<serverId>quay</serverId>
+				</configuration>
+				<executions>
+					<execution>
+						<id>build-image</id>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>tag-image</id>
+						<phase>package</phase>
+						<goals>
+							<goal>tag</goal>
+						</goals>
+						<configuration>
+							<image>ical2json</image>
+							<newName>quay.io/byuoit/ical2json-rest:${project.version}</newName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>push-image</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>push</goal>
+						</goals>
+						<configuration>
+							<imageName>quay.io/byuoit/ical2json-rest:${project.version}</imageName>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
