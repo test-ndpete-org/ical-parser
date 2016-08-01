@@ -15,7 +15,7 @@
           {
             "Cpu" : 512,
             "Essential" : true,
-            "Image" : { "Fn::Join" : ["", ["quay.io/byuoit/ical2json:", { "Ref" : "ImageTag" }]]},
+            "Image" : { "Fn::Join" : ["", ["quay.io/byuoit/ical2json-rest:", { "Ref" : "ImageTag" }]]},
             "Memory" : 256,
             "Name" : "ical2json",
             "PortMappings" : [
