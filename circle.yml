@@ -1,6 +1,8 @@
 machine:
   java:
     version: openjdk7
+  services:
+    - docker
 
 general:
   build_dir: ical
@@ -10,4 +12,4 @@ dependencies:
     - "~/.m2/repository"
   pre:
     - cp ../cicd/settings.xml ~/.m2/settings.xml
-    - mvn install -U -Dmaven.test.skip=true
+    # - mvn install -U -Dmaven.test.skip=true
