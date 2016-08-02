@@ -33,6 +33,24 @@
 		</developer>
 	</developers>
 
+	<distributionManagement>
+		<repository>
+			<id>byu-release-repo</id>
+			<name>BYU Release Repository, Deployment Definition</name>
+			<url>https://developer.byu.edu/maven2/content/repositories/byu-release-repo</url>
+		</repository>
+		<snapshotRepository>
+			<id>byu-snapshot-repo</id>
+			<name>BYU Snapshot Repository, Deployment Definition</name>
+			<url>https://developer.byu.edu/maven2/content/repositories/byu-snapshot-repo</url>
+		</snapshotRepository>
+		<site>
+			<id>byu-site-deploy</id>
+			<name>BYU Site Deployment Location</name>
+			<url>scp://oitforge.byu.edu/data/repo/oitforge/site/maven/${project.groupId}/${project.artifactId}/${project.version}</url>
+		</site>
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>
