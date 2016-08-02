@@ -59,7 +59,7 @@ public class TimeSpan implements Comparable<TimeSpan> {
     }
 
     public boolean fits(Date from, Date to) {
-        return !to.before(this.start) && !from.after(this.start) && !(this.end != null && this.end.after(to) && !this.isAllDay());
+        return (start.after(from) || start.equals(from)) && (end.before(to) || (end.equals(to)));
     }
 
     private static boolean sameOrAfter(Date compare, Date compareTo) {
