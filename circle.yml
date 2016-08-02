@@ -3,4 +3,4 @@ machine:
     version: openjdk7
 
 general:
-  build_dir: ical/src
+  build_dir: ical
