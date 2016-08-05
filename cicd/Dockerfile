@@ -20,4 +20,4 @@ RUN echo "byu.app.stage=${APPSTAGE}" >>/opt/tomcat/conf/catalina.properties && \
   echo "byu.appstage=${APPSTAGE}" >>/opt/tomcat/conf/catalina.properties && \
   echo "export JAVA_OPTS='-Xms164m -Xmx164m -server -XX:PermSize=64m -XX:MaxPermSize=64m'" >>/opt/tomcat/bin/setenv.sh
 
-COPY target/ical.war /usr/local/tomcat/webapps/services#ical-parser.war
+COPY target/ical.war /opt/tomcat/webapps/services#ical-parser.war
