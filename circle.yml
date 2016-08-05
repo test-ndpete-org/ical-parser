@@ -56,7 +56,7 @@ deployment:
 #        echo "]" >>parameters.json
       - >
         source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
-        export AWS_ACCESS_KEY_ID=${AWS_PROD_KEY} && export AWS_SECRET_ACCESS_KEY=${AWS_PROD_SECRET} &&
+        export AWS_ACCESS_KEY_ID=${AWS_PROD_KEY} && export AWS_SECRET_ACCESS_KEY=${AWS_PROD_SECRET} && export AWS_DEFAULT_REGION=us-west-2 &&
         aws cloudformation update-stack --stack-name ical2json-ecs --template-body file://cicd/cloudformation/ecsService.json
         --parameters "ParameterKey=ImageTag,ParameterValue=${CIRCLE_SHA1:0:16},UsePreviousValue=false"
 
