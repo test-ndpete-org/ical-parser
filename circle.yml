@@ -4,12 +4,20 @@ machine:
   services:
     - docker
 
-general:
-  build_dir: ical
-
 dependencies:
   cache_directories:
     - "~/.m2/repository"
   pre:
-    - cp ../cicd/settings.xml ~/.m2/settings.xml
-    # - mvn install -U -Dmaven.test.skip=true
+    - docker version
+    - docker login -e "$DOCKER_EMAIL" -u "$DOCKER_USER" -p "$DOCKER_PASS" quay.io
+    - cp cicd/settings.xml ~/.m2/settings.xml
+    - mvn install -U -Dmaven.test.skip=true
+    - mvn help:evaluate -Dexpression=project.version
+    - >
+      mvn help:evaluate -Dexpression=project.version |grep -vE -e '^\[[A-Z]+\]\s+.*$' -e '^Download(ing|ed): ' >../project-version.txt
+
+test:
+  post:
+    - >
+      ./cicd/dockerize.sh "^" "$CIRCLE_SHA1" "$CIRCLE_BRANCH"
+    - docker logout quay.io

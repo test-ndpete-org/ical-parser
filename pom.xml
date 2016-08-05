@@ -310,7 +310,7 @@
 				<version>0.4.11</version>
 				<configuration>
 					<imageName>ical2json</imageName>
-					<dockerDirectory>${project.basedir}</dockerDirectory>
+					<dockerDirectory>cicd</dockerDirectory>
 					<forceTags>true</forceTags>
 					<serverId>quay</serverId>
 				</configuration>
