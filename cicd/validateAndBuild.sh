@@ -9,7 +9,7 @@ if [ "$PROJBRANCH" = "versioning" ]; then
 	mvn clean install
 elif [ $SNAP -eq 1 ] && [ "$PROJBRANCH" = "master" ]; then
 	echo "SNAPSHOT version on master branch"
-	mvn clean test
+	mvn clean install
 elif [ $SNAP -eq 1 ]; then
 	echo "SNAPSHOT version on other branch ($PROJBRANCH)"
 	mvn clean deploy
