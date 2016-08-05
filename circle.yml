@@ -27,7 +27,7 @@ dependencies:
       mvn help:evaluate -Dexpression=project.version |grep -vE -e '^\[[A-Z]+\]\s+.*$' -e '^Download(ing|ed): ' >../project-version.txt
     - curl -Lo cicd/deployment.zip "https://github.com/byu-oit-appdev/aws-deployment-image/archive/nondocker.zip"
     - >
-      cd cicd && unzip deployment.zip && cd aws-deployment-image-nondocker/scripts &&
+      cd cicd && chmod +x *.sh && unzip deployment.zip && cd aws-deployment-image-nondocker/scripts &&
       chmod +x *.py *.sh &&
       ls -1 *.py |cut -d . -f 1 |xargs -I {} ln -sf {}.py {} &&
       cd ../.. && mv aws-deployment-image-nondocker/scripts/* .
