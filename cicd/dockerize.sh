@@ -21,6 +21,6 @@ fi
 docker build -f cicd/Dockerfile -t apptomcat:local .
 
 if [ "$PROJBRANCH" = "master" ] || [ "$PROJBRANCH" = "dev" ]; then
-  docker tag apptomcat:local quay.io/byuoit/student-voting-rest:$PROJVER
-  [ "$4" != "skip" ] && docker push quay.io/byuoit/student-voting-rest:$PROJVER
+  docker tag apptomcat:local quay.io/byuoit/ical2json-rest:$PROJVER
+  [ "$4" != "skip" ] && docker push quay.io/byuoit/ical2json-rest:$PROJVER
 fi
