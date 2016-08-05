@@ -1,8 +1,18 @@
 machine:
+  pre:
+    - sudo curl -L -o /usr/bin/docker 'https://s3-external-1.amazonaws.com/circle-downloads/docker-1.9.1-circleci'
+    - sudo chmod 0755 /usr/bin/docker
+  timezone:
+    America/Los_Angeles
   java:
-    version: openjdk7
+    version: oraclejdk7
   services:
     - docker
+  environment:
+    REPO_NAME: ${CIRCLE_PROJECT_REPONAME}
+    COMMIT_MESSAGE: "Code from $CIRCLE_BRANCH: $CIRCLE_SHA1"
+    COMMIT_ID: ${CIRCLE_SHA1}
+    CI_COMMIT_MESSAGE: "`git log --oneline -n 1 $CIRCLE_SHA1`"
 
 dependencies:
   cache_directories:
@@ -15,9 +25,19 @@ dependencies:
     - mvn help:evaluate -Dexpression=project.version
     - >
       mvn help:evaluate -Dexpression=project.version |grep -vE -e '^\[[A-Z]+\]\s+.*$' -e '^Download(ing|ed): ' >../project-version.txt
+    - curl -Lo cicd/deployment.zip "https://github.com/byu-oit-appdev/aws-deployment-image/archive/nondocker.zip"
     - >
-      cd cicd  && chmod +x *.sh && cd ..
+      cd cicd && unzip deployment.zip && cd aws-deployment-image-nondocker/scripts &&
+      chmod +x *.py *.sh &&
+      ls -1 *.py |cut -d . -f 1 |xargs -I {} ln -sf {}.py {} &&
+      cd ../.. && mv aws-deployment-image-nondocker/scripts/* .
+    - >
+      virtualenv venv && source venv/bin/activate &&
+      pip install --upgrade -r cicd/requirements.txt pyopenssl ndg-httpsclient pyasn1 && cd ..
+    - aws --version
 test:
+  override:
+    - ./cicd/validateAndBuild.sh "$CIRCLE_BRANCH"
   post:
     - >
       ./cicd/dockerize.sh "^" "$CIRCLE_SHA1" "$CIRCLE_BRANCH"
