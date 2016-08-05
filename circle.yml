@@ -15,7 +15,8 @@ dependencies:
     - mvn help:evaluate -Dexpression=project.version
     - >
       mvn help:evaluate -Dexpression=project.version |grep -vE -e '^\[[A-Z]+\]\s+.*$' -e '^Download(ing|ed): ' >../project-version.txt
-
+    - >
+      cd cicd  && chmod +x *.sh && cd ..
 test:
   post:
     - >
