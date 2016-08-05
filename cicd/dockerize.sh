@@ -18,9 +18,7 @@ if [ "$APPSTAGE" = "^" ]; then
   fi
 fi
 
-docker build -f cicd/Dockerfile \
-  --build-arg APPSTAGE=$APPSTAGE \
-  -t apptomcat:local .
+docker build -f cicd/Dockerfile -t apptomcat:local .
 
 if [ "$PROJBRANCH" = "master" ] || [ "$PROJBRANCH" = "dev" ]; then
   docker tag apptomcat:local quay.io/byuoit/student-voting-rest:$PROJVER
