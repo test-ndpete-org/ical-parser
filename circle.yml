@@ -48,7 +48,6 @@ deployment:
     branch: master
     commands:
       - echo "master"
-      - echo ${SERVICENOW_URL}
 #     - >
 #       echo "[" >parameters.json &&
 #       echo "{\"ParameterKey\": \"ImageName\", \"ParameterValue\": \"${CIRCLE_SHA1:0:16}\", \"UsePreviousValue\": false}," >>parameters.json &&
