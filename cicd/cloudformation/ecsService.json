@@ -1,11 +1,27 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Parameters" : {
-    "ImageTag" : {
-      "Description" : "The image tag to deploy to the ecs cluster",
-      "Type" : "String",
-      "Default" : "latest"
-    }
+    "Parameters" : {
+      "ImageName": {
+        "Description": "Name:tag of docker image.",
+        "Type": "String",
+        "MinLength": 4,
+        "MaxLength": 4096,
+        "NoEcho": false
+      },
+      "TomcatUsers": {
+        "Description": "Content of tomcat-users.xml file",
+        "Type": "String",
+        "MinLength": 4,
+        "MaxLength": 4096,
+        "NoEcho": true
+      },
+      "AppProperties": {
+        "Description": "Content of application properties file",
+        "Type": "String",
+        "MinLength": 4,
+        "MaxLength": 16384,
+        "NoEcho": true
+      }
   },
   "Resources": {
     "task": {
@@ -15,7 +31,7 @@
           {
             "Cpu" : 512,
             "Essential" : true,
-            "Image" : { "Fn::Join" : ["", ["quay.io/byuoit/ical2json-rest:", { "Ref" : "ImageTag" }]]},
+            "Image" : { "Ref" : "ImageName" },
             "Memory" : 256,
             "Name" : "ical2json",
             "PortMappings" : [
@@ -25,6 +41,10 @@
               }
             ]
           }
+        ],
+        "Environment" : [
+          { "Name": "TOMCAT_USERS", "Value": { "Ref": "TomcatUsers" }},
+          { "Name": "APPLICATION_PROPERTIES", "Value": { "Ref": "AppProperties" }}
         ]
       }
     },

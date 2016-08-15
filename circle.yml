@@ -48,17 +48,24 @@ deployment:
     branch: master
     commands:
       - echo "master"
-#      - >
-#        echo "[" >parameters.json &&
-#        echo "{\"ParameterKey\": \"ImageName\", \"ParameterValue\": \"${CIRCLE_SHA1:0:16}\", \"UsePreviousValue\": false}," >>parameters.json &&
-#        echo "{\"ParameterKey\": \"TomcatUsers\", \"ParameterValue\": \"$TOMCAT_USERS\", \"UsePreviousValue\": false}," >>parameters.json &&
-#        echo "{\"ParameterKey\": \"AppProperties\", \"ParameterValue\": \"$APPLICATION_PROPERTIES\", \"UsePreviousValue\": false}" >>parameters.json &&
-#        echo "]" >>parameters.json
+#     - >
+#       echo "[" >parameters.json &&
+#       echo "{\"ParameterKey\": \"ImageName\", \"ParameterValue\": \"${CIRCLE_SHA1:0:16}\", \"UsePreviousValue\": false}," >>parameters.json &&
+#       echo "{\"ParameterKey\": \"TomcatUsers\", \"ParameterValue\": \"$TOMCAT_USERS\", \"UsePreviousValue\": false}," >>parameters.json &&
+#       echo "{\"ParameterKey\": \"AppProperties\", \"ParameterValue\": \"$APPLICATION_PROPERTIES\", \"UsePreviousValue\": false}" >>parameters.json &&
+#       echo "]" >>parameters.json
       - >
-        source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
-        export AWS_ACCESS_KEY_ID=${AWS_PROD_KEY} && export AWS_SECRET_ACCESS_KEY=${AWS_PROD_SECRET} && export AWS_DEFAULT_REGION=us-west-2 &&
-        aws cloudformation update-stack --stack-name ical2json-ecs --template-body file://cicd/cloudformation/ecsService.json
-        --parameters "ParameterKey=ImageTag,ParameterValue=${CIRCLE_SHA1:0:16},UsePreviousValue=false"
+       source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
+       export AWS_ACCESS_KEY_ID=${AWS_PROD_KEY} && export AWS_SECRET_ACCESS_KEY=${AWS_PROD_SECRET} &&
+       deployment_workflow.sh ical2json-ecs
+       "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
+       "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
+       "ParameterKey=AppProperties,ParameterValue=${APPLICATION_PROPERTIES},UsePreviousValue=false"
+#     - >
+#       source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
+#       export AWS_ACCESS_KEY_ID=${AWS_PROD_KEY} && export AWS_SECRET_ACCESS_KEY=${AWS_PROD_SECRET} && export AWS_DEFAULT_REGION=us-west-2 &&
+#       aws cloudformation update-stack --stack-name ical2json-ecs --template-body file://cicd/cloudformation/ecsService.json
+#       --parameters "ParameterKey=ImageTag,ParameterValue=${CIRCLE_SHA1:0:16},UsePreviousValue=false"
 
 
 #        deployment_workflow.sh student-voting-api file:///repo/parameters.json
@@ -75,8 +82,8 @@ deployment:
         -e TEMPLATE_FILE=/repo/cicd/cloudformation/stack-stg.json
         quay.io/byuoit/aws-deployment:master
         aws "cloudformation" "update-stack" "--stack-name" "student-voting-api"
-        "--template-body" "file:///repo/cicd/cloudformation/stack-stg.json"
+        "--template-body" "file:///repo/cicd/cloudformation/ecsService.json"
         "--parameters"
-        "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/student-voting-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
+        "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
         "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
         "ParameterKey=AppProperties,ParameterValue=${LOCAL_PROPERTIES},UsePreviousValue=false"
