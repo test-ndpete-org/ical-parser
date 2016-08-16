@@ -39,12 +39,12 @@
                 "ContainerPort" : 8080,
                 "HostPort" : 5003
               }
+            ],
+            "Environment" : [
+              { "Name": "TOMCAT_USERS", "Value": { "Ref": "TomcatUsers" }},
+              { "Name": "APPLICATION_PROPERTIES", "Value": { "Ref": "AppProperties" }}
             ]
           }
-        ],
-        "Environment" : [
-          { "Name": "TOMCAT_USERS", "Value": { "Ref": "TomcatUsers" }},
-          { "Name": "APPLICATION_PROPERTIES", "Value": { "Ref": "AppProperties" }}
         ]
       }
     },
