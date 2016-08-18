@@ -79,10 +79,10 @@ deployment:
         -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_STG}
         -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_STG}
         -e AWS_DEFAULT_REGION=us-west-2
-        -e TEMPLATE_FILE=/repo/cicd/cloudformation/stack-stg.json
+        -e TEMPLATE_FILE=/repo/cicd/cloudformation/ecsService-stg.json
         quay.io/byuoit/aws-deployment:master
         aws "cloudformation" "update-stack" "--stack-name" "student-voting-api"
-        "--template-body" "file:///repo/cicd/cloudformation/ecsService.json"
+        "--template-body" "file:///repo/cicd/cloudformation/ecsService-stg.json"
         "--parameters"
         "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
         "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"

@@ -29,7 +29,7 @@
       "Properties": {
         "ContainerDefinitions": [
           {
-            "Cpu" : 100,
+            "Cpu" : 512,
             "Essential" : true,
             "Image" : { "Ref" : "ImageName" },
             "Memory" : 256,
@@ -51,7 +51,7 @@
     "service": {
       "Type" : "AWS::ECS::Service",
       "Properties" : {
-        "Cluster" : "arn:aws:ecs:us-west-2:947037354084:cluster/ecs-cluster-prod-small-EcsCluster-1EDHC8WTKQURL",
+        "Cluster" : "arn:aws:ecs:us-west-2:818272543125:cluster/default",
         "DesiredCount" : 2,
         "LoadBalancers" : [
           {
@@ -60,7 +60,7 @@
             "LoadBalancerName" : "elb-ical2json"
           }
         ],
-        "Role" : "arn:aws:iam::947037354084:role/ecsServiceRole",
+        "Role" : "arn:aws:iam::818272543125:role/ecsServiceRole",
         "TaskDefinition" : {
           "Ref" : "task"
         }
@@ -92,13 +92,13 @@
             "InstanceProtocol" : "HTTP",
             "LoadBalancerPort" : "443",
             "Protocol" : "HTTPS",
-            "SSLCertificateId" : "arn:aws:iam::947037354084:server-certificate/star_devops_byu_edu"
+            "SSLCertificateId" : "arn:aws:iam::818272543125:server-certificate/star_devops_byu_edu"
           }
         ],
         "Scheme" : "internet-facing",
         "Subnets" : [
-          "subnet-083cf27e",
-          "subnet-9e05b0fa"
+          "subnet-816a82e5",
+          "subnet-e6696591"
         ],
         "SecurityGroups" : [{
           "Ref" : "sgElb"
@@ -121,7 +121,7 @@
           "ToPort" : 65535,
           "CidrIp" : "0.0.0.0/0"
         }],
-        "VpcId" : "vpc-71ac0515"
+        "VpcId" : "vpc-5e896f3a"
       }
     },
     "sg" : {
@@ -131,7 +131,7 @@
         "FromPort" : 5003,
         "ToPort" : 5003,
         "CidrIp" : "0.0.0.0/0",
-        "GroupId" : "sg-8a6e6ded"
+        "GroupId" : "sg-8cdd79eb"
       }
     },
     "dns" : {
