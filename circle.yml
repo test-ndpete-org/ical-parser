@@ -81,7 +81,7 @@ deployment:
         -e AWS_DEFAULT_REGION=us-west-2
         -e TEMPLATE_FILE=/repo/cicd/cloudformation/ecsService-stg.json
         quay.io/byuoit/aws-deployment:master
-        aws "cloudformation" "update-stack" "--stack-name" "student-voting-api"
+        aws "cloudformation" "update-stack" "--stack-name" "ical2json-ecs"
         "--template-body" "file:///repo/cicd/cloudformation/ecsService-stg.json"
         "--parameters"
         "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
