@@ -48,12 +48,6 @@ deployment:
     branch: master
     commands:
       - echo "master"
-#     - >
-#       echo "[" >parameters.json &&
-#       echo "{\"ParameterKey\": \"ImageName\", \"ParameterValue\": \"${CIRCLE_SHA1:0:16}\", \"UsePreviousValue\": false}," >>parameters.json &&
-#       echo "{\"ParameterKey\": \"TomcatUsers\", \"ParameterValue\": \"$TOMCAT_USERS\", \"UsePreviousValue\": false}," >>parameters.json &&
-#       echo "{\"ParameterKey\": \"AppProperties\", \"ParameterValue\": \"$APPLICATION_PROPERTIES\", \"UsePreviousValue\": false}" >>parameters.json &&
-#       echo "]" >>parameters.json
       - >
        source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
        export AWS_ACCESS_KEY_ID=${AWS_PROD_KEY} && export AWS_SECRET_ACCESS_KEY=${AWS_PROD_SECRET} &&
@@ -61,22 +55,11 @@ deployment:
        "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
        "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
        "ParameterKey=AppProperties,ParameterValue=${APPLICATION_PROPERTIES},UsePreviousValue=false"
-#     - >
-#       source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
-#       export AWS_ACCESS_KEY_ID=${AWS_PROD_KEY} && export AWS_SECRET_ACCESS_KEY=${AWS_PROD_SECRET} && export AWS_DEFAULT_REGION=us-west-2 &&
-#       aws cloudformation update-stack --stack-name ical2json-ecs --template-body file://cicd/cloudformation/ecsService.json
-#       --parameters "ParameterKey=ImageTag,ParameterValue=${CIRCLE_SHA1:0:16},UsePreviousValue=false"
-
-
-#        deployment_workflow.sh student-voting-api file:///repo/parameters.json
-
-#        Add runscope / ghost inspector testing in dev
-#        Change branch to stage later
 
   stage:
-    branch: dev
+    branch: stage
     commands:
-      - echo "dev"
+      - echo "stage"
       - >
         docker run --rm -v $PWD:/repo
         -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_STG}
@@ -90,3 +73,4 @@ deployment:
         "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
         "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
         "ParameterKey=AppProperties,ParameterValue=${LOCAL_PROPERTIES},UsePreviousValue=false"
+        runscope_test "ical2json-ecs" "STG"

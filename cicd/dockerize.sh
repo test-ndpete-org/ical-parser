@@ -22,7 +22,7 @@ fi
 if [ "$APPSTAGE" = "^" ]; then
   if [ "$PROJBRANCH" = "master" ]; then
     APPSTAGE="prod"
-  elif [ "$PROJBRANCH" = "dev" ]; then
+  elif [ "$PROJBRANCH" = "stage" ]; then
     APPSTAGE="stage"
   else
     APPSTAGE="dev"
@@ -43,7 +43,7 @@ docker tag apptomcat:local quay.io/byuoit/ical2json-rest:$PROJBRANCH
 docker tag apptomcat:local quay.io/byuoit/ical2json-rest:${PROJSHA:0:16}
 [ "$4" != "skip" ] && docker push quay.io/byuoit/ical2json-rest:${PROJSHA:0:16}
 
-if [ "$PROJBRANCH" = "master" ] || [ "$PROJBRANCH" = "dev" ]; then
+if [ "$PROJBRANCH" = "master" ] || [ "$PROJBRANCH" = "stage" ]; then
   docker tag apptomcat:local quay.io/byuoit/ical2json-rest:$PROJVER
   [ "$4" != "skip" ] && docker push quay.io/byuoit/ical2json-rest:$PROJVER
 fi
