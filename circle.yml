@@ -73,4 +73,4 @@ deployment:
         "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
         "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
         "ParameterKey=AppProperties,ParameterValue=${LOCAL_PROPERTIES},UsePreviousValue=false"
-      - runscope_test "ical2json-ecs" "STG"
+      - cd cicd/cloudformation && runscope_test "ical2json-ecs" "STG"
