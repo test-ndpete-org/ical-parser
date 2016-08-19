@@ -74,4 +74,5 @@ deployment:
         "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
         "ParameterKey=AppProperties,ParameterValue=${LOCAL_PROPERTIES},UsePreviousValue=false"
       - >
+        source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
         cd cicd/cloudformation && runscope_test "ical2json-ecs" "STG"
