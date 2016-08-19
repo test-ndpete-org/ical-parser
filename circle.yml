@@ -70,6 +70,9 @@ deployment:
 
 #        deployment_workflow.sh student-voting-api file:///repo/parameters.json
 
+#        Add runscope / ghost inspector testing in dev
+#        Change branch to stage later
+
   stage:
     branch: dev
     commands:

@@ -37,7 +37,7 @@
             "PortMappings" : [
               {
                 "ContainerPort" : 8080,
-                "HostPort" : 5003
+                "HostPort" : 7002
               }
             ],
             "Environment" : [
@@ -81,18 +81,18 @@
         "HealthCheck" : {
           "HealthyThreshold" : "2",
           "Interval" : "30",
-          "Target" : "HTTP:5003/",
+          "Target" : "HTTP:7002/",
           "Timeout" : "3",
           "UnhealthyThreshold" : "2"
         },
         "LoadBalancerName" : "elb-ical2json",
         "Listeners" : [
           {
-            "InstancePort" : "5003",
+            "InstancePort" : "7002",
             "InstanceProtocol" : "HTTP",
             "LoadBalancerPort" : "443",
             "Protocol" : "HTTPS",
-            "SSLCertificateId" : "arn:aws:iam::947037354084:server-certificate/star_devops_byu_edu"
+            "SSLCertificateId" : "arn:aws:iam::947037354084:server-certificate/mobile"
           }
         ],
         "Scheme" : "internet-facing",
@@ -128,8 +128,8 @@
       "Type": "AWS::EC2::SecurityGroupIngress",
       "Properties": {
         "IpProtocol" : "tcp",
-        "FromPort" : 5003,
-        "ToPort" : 5003,
+        "FromPort" : 7002,
+        "ToPort" : 7002,
         "CidrIp" : "0.0.0.0/0",
         "GroupId" : "sg-8a6e6ded"
       }
@@ -137,13 +137,13 @@
     "dns" : {
       "Type" : "AWS::Route53::RecordSet",
       "Properties" : {
-        "HostedZoneName" : "devops.byu.edu.",
-        "Name" : "ical2json.devops.byu.edu.",
+        "HostedZoneName" : "mobile.byu.edu.",
+        "Name" : "ical2json.mobile.byu.edu.",
         "Type" : "A",
         "AliasTarget" : {
           "DNSName" : {"Fn::GetAtt" : ["elb", "DNSName"]},
           "EvaluateTargetHealth" : false,
-          "HostedZoneId" : "Z1H1FL5HABSF5"
+          "HostedZoneId" : "Z33MTJ483KN6FU"
         }
       },
       "DependsOn" : "elb"
