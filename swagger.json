@@ -1,0 +1,319 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "iCal parsing rest service is a restful web service that takes an iCal URL as an input and returns calendar information in JSON",
+    "version": "1.0.0",
+    "title": "ical2json-rest",
+    "contact": {}
+  },
+  "host": "ical2json.mobile.byu.edu:80",
+  "basePath": "/services/ical-parser",
+  "tags": [],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/rest/v1/occurrences": {
+      "get": {
+        "tags": [],
+        "summary": "Calculate occurrences",
+        "description": "Calculates the occurrences of a given repeat pattern.",
+        "consumes": [],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "description": "The first date for which events will be shown. It is optional and defaults to 'today'. It must be in the form 'yyy-MM-dd'",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offsets the first date for which events will be shown by a specified amount. It is optional and defaults to '0' Must be in the form of a positive integer, followed by one of the following: D (day) WK (week) MO (month) Y (year)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "show",
+            "in": "query",
+            "description": "Must be in the form of a positive integer, followed by one of the following: D (day) WK (week) MO (month) Y (year). 'show' and 'until' are both optional. If neither is specified, 'show' defaults to '3MO'. If 'until' is specified, the value of 'show' is ignored.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "Must be a date, in the form 'yyyy-MM-dd'. 'show' and 'until' are both optional. If neither is specified, 'show' defaults to '3MO'. If 'until' is specified, the value of 'show' is ignored.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ruleStart",
+            "in": "query",
+            "description": "Start date/time of the event.  Should be in the ical date format.",
+            "required": true,
+            "type": "string",
+            "x-example": "20171231T120000"
+          },
+          {
+            "name": "ruleEnd",
+            "in": "query",
+            "description": "End date/time of the event.  Should be in ical date format.",
+            "required": true,
+            "type": "string",
+            "x-example": "20160101T120000"
+          },
+          {
+            "name": "rule",
+            "in": "query",
+            "description": "iCal repeat rule.",
+            "required": true,
+            "type": "string",
+            "x-example": "FREQ=WEEKLY"
+          },
+          {
+            "name": "exceptions",
+            "in": "query",
+            "description": "iCal EXDATE value",
+            "required": false,
+            "type": "string",
+            "x-example": "20131015T181500"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a JSON array of occurrences",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JSON Occurrence"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request indicates an error parsing the dates passed in the query parameters"
+          },
+          "500": {
+            "description": "Internal error indicates an error with the query parameters"
+          }
+        }
+      },
+      "post": {
+        "tags": [],
+        "summary": "Calculate occurrences",
+        "description": "Calculates the occurrences of a given repeat pattern.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a JSON array of occurrences",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/JSON Occurrence"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request indicates an error parsing the dates passed in the query parameters"
+          },
+          "500": {
+            "description": "Internal error indicates an error with the query parameters"
+          }
+        }
+      }
+    },
+    "/rest/v1/parse": {
+      "get": {
+        "tags": [],
+        "summary": "Parse iCal feed",
+        "description": "Parses an iCal calendar feed into JSON",
+        "consumes": [],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "feedUrl",
+            "in": "query",
+            "description": "The URL of the iCal feed to be parsed.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "The first date for which events will be shown. It is optional and defaults to 'today'. It must be in the form 'yyyy-MM-dd'",
+            "required": false,
+            "type": "string",
+            "x-example": "2000-01-30"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offsets the first date for which events will be shown by a specified amount. It is optional and defaults to '0' Must be in the form of a positive integer, followed by one of the following: D (day) WK (week) MO (month) Y (year)",
+            "required": false,
+            "type": "string",
+            "x-example": "3MO"
+          },
+          {
+            "name": "show",
+            "in": "query",
+            "description": "Must be in the form of a positive integer, followed by one of the following: D (day) WK (week) MO (month) Y (year). 'show' and 'until' are both optional. If neither is specified, 'show' defaults to '3MO'. If 'until' is specified, the value of 'show' is ignored.",
+            "required": false,
+            "type": "string",
+            "x-example": "3MO"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "Must be a date, in the form 'yyyy-MM-dd'. 'show' and 'until' are both optional. If neither is specified, 'show' defaults to '3MO'. If 'until' is specified, the value of 'show' is ignored.",
+            "required": false,
+            "type": "string",
+            "x-example": "2000-01-30"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/JSON Calendar"
+            }
+          },
+          "400": {
+            "description": "Bad request indicates lack of required parameters, invalid feedUrl, or error parsing the calendar"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Exception": {
+      "type": "object",
+      "description": "An exception in iCal EXDATE format represented in JSON"
+    },
+    "JSON Calendar": {
+      "type": "object",
+      "properties": {
+        "allDay": {
+          "type": "boolean",
+          "description": "Flag indicating if event is an all day event",
+          "default": false
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the event"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date",
+          "description": "End date of event"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the event"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date",
+          "description": "Time event was modified"
+        },
+        "occurrences": {
+          "type": "array",
+          "description": "Occurrences of the event",
+          "items": {
+            "$ref": "#/definitions/JSON Occurrence"
+          }
+        },
+        "repeatRule": {
+          "description": "Repeat rule for the event",
+          "$ref": "#/definitions/Repeat Rule"
+        },
+        "repeats": {
+          "type": "boolean",
+          "description": "Flag indicating if event is repeating",
+          "default": false
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Start date of event"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Summary of event"
+        },
+        "uid": {
+          "type": "string",
+          "description": "Unique ID"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "description": "An iCal calendar in JSON format"
+    },
+    "JSON Occurrence": {
+      "type": "object",
+      "properties": {
+        "allDay": {
+          "type": "boolean",
+          "description": "Flag indicating of the occurrence is all day",
+          "default": false
+        },
+        "end": {
+          "type": "string",
+          "format": "date",
+          "description": "End date of the occurrence"
+        },
+        "start": {
+          "type": "string",
+          "format": "date",
+          "description": "Start date of the occurrence"
+        }
+      },
+      "description": "An occurrence for an iCal event in JSON format"
+    },
+    "Repeat Rule": {
+      "type": "object",
+      "properties": {
+        "exceptions": {
+          "type": "array",
+          "description": "Any exceptions to the rule",
+          "items": {
+            "$ref": "#/definitions/Exception"
+          }
+        },
+        "firstOccurrenceEnd": {
+          "type": "string",
+          "description": "End of the first occurrence of the rule"
+        },
+        "firstOccurrenceStart": {
+          "type": "string",
+          "description": "Start of the first occurrence of the rule"
+        },
+        "rule": {
+          "type": "string",
+          "description": "Rule in iCal Repeat rule format"
+        }
+      },
+      "description": "A repeat rule in JSON following the iCal repeat rule format"
+    }
+  }
+}
