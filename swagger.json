@@ -10,7 +10,7 @@
   "basePath": "/services/ical-parser",
   "tags": [],
   "schemes": [
-    "http"
+    "https"
   ],
   "paths": {
     "/rest/v1/occurrences": {
@@ -112,12 +112,64 @@
         ],
         "parameters": [
           {
-            "in": "body",
-            "name": "body",
+            "name": "start",
+            "in": "query",
+            "description": "The first date for which events will be shown. It is optional and defaults to 'today'. It must be in the form 'yyy-MM-dd'",
             "required": false,
-            "schema": {
-              "type": "string"
-            }
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Offsets the first date for which events will be shown by a specified amount. It is optional and defaults to '0' Must be in the form of a positive integer, followed by one of the following: D (day) WK (week) MO (month) Y (year)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "show",
+            "in": "query",
+            "description": "Must be in the form of a positive integer, followed by one of the following: D (day) WK (week) MO (month) Y (year). 'show' and 'until' are both optional. If neither is specified, 'show' defaults to '3MO'. If 'until' is specified, the value of 'show' is ignored.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "Must be a date, in the form 'yyyy-MM-dd'. 'show' and 'until' are both optional. If neither is specified, 'show' defaults to '3MO'. If 'until' is specified, the value of 'show' is ignored.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ruleStart",
+            "in": "query",
+            "description": "Start date/time of the event.  Should be in the ical date format.",
+            "required": true,
+            "type": "string",
+            "x-example": "20171231T120000"
+          },
+          {
+            "name": "ruleEnd",
+            "in": "query",
+            "description": "End date/time of the event.  Should be in ical date format.",
+            "required": true,
+            "type": "string",
+            "x-example": "20160101T120000"
+          },
+          {
+            "name": "rule",
+            "in": "query",
+            "description": "iCal repeat rule.",
+            "required": true,
+            "type": "string",
+            "x-example": "FREQ=WEEKLY"
+          },
+          {
+            "name": "exceptions",
+            "in": "query",
+            "description": "iCal EXDATE value",
+            "required": false,
+            "type": "string",
+            "x-example": "20131015T181500"
           }
         ],
         "responses": {
