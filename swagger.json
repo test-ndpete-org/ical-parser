@@ -13,7 +13,7 @@
     "https"
   ],
   "paths": {
-    "occurrences": {
+    "/occurrences": {
       "get": {
         "tags": [],
         "summary": "Calculate occurrences",
@@ -191,7 +191,7 @@
         }
       }
     },
-    "parse": {
+    "/parse": {
       "get": {
         "tags": [],
         "summary": "Parse iCal feed",
