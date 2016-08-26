@@ -6,14 +6,14 @@
     "title": "ical2json-rest",
     "contact": {}
   },
-  "host": "ical2json.mobile.byu.edu:80",
+  "host": "api.byu.edu",
   "basePath": "/services/ical-parser",
   "tags": [],
   "schemes": [
     "https"
   ],
   "paths": {
-    "/rest/v1/occurrences": {
+    "occurrences": {
       "get": {
         "tags": [],
         "summary": "Calculate occurrences",
@@ -191,7 +191,7 @@
         }
       }
     },
-    "/rest/v1/parse": {
+    "parse": {
       "get": {
         "tags": [],
         "summary": "Parse iCal feed",
