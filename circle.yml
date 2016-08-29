@@ -30,7 +30,10 @@ dependencies:
     - mvn help:evaluate -Dexpression=project.version
     - >
       mvn help:evaluate -Dexpression=project.version |grep -vE -e '^\[[A-Z]+\]\s+.*$' -e '^Download(ing|ed): ' >../project-version.txt
-    - pip install --upgrade -r ./cicd/scripts/requirements.txt pyopenssl ndg-httpsclient pyasn1
+    - cd cicd && chmod +x *.sh && cd scripts && chmod +x *.py *.sh && cd ../..
+    - >
+      virtualenv venv && source venv/bin/activate &&
+      pip install --upgrade -r cicd/scripts/requirements.txt pyopenssl ndg-httpsclient pyasn1
     - aws --version
 test:
   override:
