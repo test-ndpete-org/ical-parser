@@ -1,1 +1,3 @@
-
+[submodule "cicd/scripts"]
+	path = cicd/scripts
+	url = https://github.com/byu-oit-appdev/pipeline-scripts

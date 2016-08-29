@@ -25,15 +25,8 @@ dependencies:
     - mvn help:evaluate -Dexpression=project.version
     - >
       mvn help:evaluate -Dexpression=project.version |grep -vE -e '^\[[A-Z]+\]\s+.*$' -e '^Download(ing|ed): ' >../project-version.txt
-    - curl -Lo cicd/deployment.zip "https://github.com/byu-oit-appdev/aws-deployment-image/archive/nondocker.zip"
-    - >
-      cd cicd && chmod +x *.sh && unzip deployment.zip && cd aws-deployment-image-nondocker/scripts &&
-      chmod +x *.py *.sh &&
-      ls -1 *.py |cut -d . -f 1 |xargs -I {} ln -sf {}.py {} &&
-      cd ../.. && mv aws-deployment-image-nondocker/scripts/* .
-    - >
-      virtualenv venv && source venv/bin/activate &&
-      pip install --upgrade -r cicd/requirements.txt pyopenssl ndg-httpsclient pyasn1 && cd ..
+    - cd cicd/scripts && chmod +x *.py *.sh && cd ../..
+    - pip install --upgrade -r ./cicd/scripts/requirements.txt pyopenssl ndg-httpsclient pyasn1
     - aws --version
 test:
   override:
@@ -51,7 +44,7 @@ deployment:
       - >
        source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
        export AWS_ACCESS_KEY_ID=${AWS_PROD_KEY} && export AWS_SECRET_ACCESS_KEY=${AWS_PROD_SECRET} &&
-       deployment_workflow.sh ical2json-ecs
+       ./cicd/scripts/deployment_workflow.sh ical2json-ecs
        "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
        "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
        "ParameterKey=AppProperties,ParameterValue=${APPLICATION_PROPERTIES},UsePreviousValue=false"
@@ -73,6 +66,4 @@ deployment:
         "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
         "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
         "ParameterKey=AppProperties,ParameterValue=${LOCAL_PROPERTIES},UsePreviousValue=false"
-      - >
-        source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
-        cd cicd/cloudformation && runscope_test "ical2json-ecs" "STG"
+      - ./cicd/scripts/runscope_test.py "ical2json-ecs" "STG"
