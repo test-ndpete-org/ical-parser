@@ -25,7 +25,6 @@ dependencies:
     - mvn help:evaluate -Dexpression=project.version
     - >
       mvn help:evaluate -Dexpression=project.version |grep -vE -e '^\[[A-Z]+\]\s+.*$' -e '^Download(ing|ed): ' >../project-version.txt
-    - cd cicd/scripts && chmod +x *.py *.sh && cd ../..
     - pip install --upgrade -r ./cicd/scripts/requirements.txt pyopenssl ndg-httpsclient pyasn1
     - aws --version
 test:
@@ -66,4 +65,5 @@ deployment:
         "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
         "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
         "ParameterKey=AppProperties,ParameterValue=${LOCAL_PROPERTIES},UsePreviousValue=false"
+      - ./cicd/scripts/wait_for_cloudformation.py "ical2json-ecs"
       - ./cicd/scripts/runscope_test.py "ical2json-ecs" "STG"
