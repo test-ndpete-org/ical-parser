@@ -60,9 +60,9 @@ deployment:
     branch: stage
     commands:
       - echo "stage"
-      - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_STG} && export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_STG}
       - >
-        echo $PWD
+        source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
+        export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_STG} && export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_STG} &&
         aws "cloudformation" "update-stack" "--stack-name" "ical2json-ecs"
         "--template-body" "file:///cicd/cloudformation/ecsService-stg.json"
         "--parameters"
@@ -71,6 +71,7 @@ deployment:
         "ParameterKey=AppProperties,ParameterValue=${LOCAL_PROPERTIES},UsePreviousValue=false"
       - >
         source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
+        export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_STG} && export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_STG} &&
         ./cicd/scripts/wait_for_cloudformation.py "ical2json-ecs"
       - >
         source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
