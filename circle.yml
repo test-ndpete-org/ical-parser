@@ -60,11 +60,13 @@ deployment:
     branch: stage
     commands:
       - echo "stage"
+      - echo $PWD
+      - cd /home/ubuntu/$CIRCLE_PROJECT_REPONAME/cicd/cloudformation
       - >
         source venv/bin/activate && export PATH=$PWD/cicd:$PATH &&
         export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_STG} && export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_STG} &&
         aws "cloudformation" "update-stack" "--stack-name" "ical2json-ecs"
-        "--template-body" "file:///cicd/cloudformation/ecsService-stg.json"
+        "--template-body" "file:///ecsService-stg.json"
         "--parameters"
         "ParameterKey=ImageName,ParameterValue=quay.io/byuoit/ical2json-rest:${CIRCLE_SHA1:0:16},UsePreviousValue=false"
         "ParameterKey=TomcatUsers,ParameterValue=${TOMCAT_USERS},UsePreviousValue=false"
