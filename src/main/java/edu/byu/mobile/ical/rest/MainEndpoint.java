@@ -190,6 +190,8 @@ public class MainEndpoint {
 		} catch (ParserException e) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
+		
+		calendar.getComponents().add(TimeZoneRegistryFactory.getInstance().createRegistry().getTimeZone("America/Denver").getVTimeZone());
 
 		final Date startDate = calculateStartDate(start, offset);
 
