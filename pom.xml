@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.byu.mobile.ical</groupId>
 	<artifactId>ical-parser-rest</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<name>iCal Parsing Rest Service</name>
 	<packaging>war</packaging>
 	<url>http://www.byu.edu</url>
