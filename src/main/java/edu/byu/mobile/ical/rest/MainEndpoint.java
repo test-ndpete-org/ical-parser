@@ -2,8 +2,8 @@ package edu.byu.mobile.ical.rest;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.ExDate;
@@ -19,7 +19,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -175,9 +174,9 @@ public class MainEndpoint {
 		if (feedUrl == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
-		
+
 		final CalendarBuilder builder = new CalendarBuilder();
-			
+
 
 		final Calendar calendar;
 		try {
@@ -192,7 +191,7 @@ public class MainEndpoint {
 		} catch (ParserException e) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
-		
+
 		final Date startDate = calculateStartDate(start, offset);
 
 		final List<Event> events = filterComponents(calendar.getComponents(), startDate, calculateEndDate(startDate, show, until));
