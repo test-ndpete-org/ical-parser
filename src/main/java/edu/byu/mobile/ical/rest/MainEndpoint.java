@@ -175,7 +175,7 @@ public class MainEndpoint {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
-		final CalendarBuilder builder = new CalendarBuilder();
+		final CalendarBuilder builder = new CalendarBuilder(DefaultTimeZoneRegistryFactory.getInstance().createRegistry());
 
 		final Calendar calendar;
 		try {
@@ -191,7 +191,7 @@ public class MainEndpoint {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 		
-		calendar.getComponents().add(TimeZoneRegistryFactory.getInstance().createRegistry().getTimeZone("America/Denver").getVTimeZone());
+//		calendar.getComponents().add(TimeZoneRegistryFactory.getInstance().createRegistry().getTimeZone("America/Denver").getVTimeZone());
 
 		final Date startDate = calculateStartDate(start, offset);
 
