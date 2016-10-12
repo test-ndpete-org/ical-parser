@@ -33,6 +33,16 @@
             "Essential" : true,
             "Image" : { "Ref" : "ImageName" },
             "Memory" : 256,
+			"MountPoints": [
+				{
+					"ContainerPath": "/etc/localtime",
+					"SourceVolume": "localtime"
+				},
+				{
+					"ContainerPath": "/etc/timezone",
+					"SourceVolume": "timezone"
+				}
+			],
             "Name" : "ical2json",
             "PortMappings" : [
               {
@@ -45,7 +55,21 @@
               { "Name": "APPLICATION_PROPERTIES", "Value": { "Ref": "AppProperties" }}
             ]
           }
-        ]
+        ],
+		  "Volumes": [
+			  {
+				  "Host": {
+					  "SourcePath": "/etc/localtime"
+				  },
+				  "Name": "localtime"
+			  },
+			  {
+				  "Host": {
+					  "SourcePath": "/etc/timezone"
+				  },
+				  "Name": "timezone"
+			  }
+		  ]
       }
     },
     "service": {
