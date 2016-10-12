@@ -176,8 +176,6 @@ public class MainEndpoint {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 		
-		TimeZone.setDefault(TimeZone.getTimeZone("America/Denver"));
-		
 		final CalendarBuilder builder = new CalendarBuilder();
 			
 
