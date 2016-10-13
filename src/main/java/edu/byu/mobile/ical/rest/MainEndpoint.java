@@ -177,6 +177,7 @@ public class MainEndpoint {
 
 		final CalendarBuilder builder = new CalendarBuilder();
 
+
 		final Calendar calendar;
 		try {
 			final String lowerFeedUrl = feedUrl.toString().toLowerCase();
