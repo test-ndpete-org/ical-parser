@@ -1,4 +1,5 @@
-$schemaver: 2.0
+---
+$schemaver: '2.0'
 deployables:
   - name: ical2json rest web serivce
     type: Web Service
