@@ -1,5 +1,6 @@
 $schemaver: '2.0'
-deployables:
+repo_url: https://github.com/test-ndpete-org/ical-parser
+software:
   - name: ical2json rest web serivce
     type: Web Service
     aliases:
@@ -16,7 +17,6 @@ deployables:
       context_map_url:
     links:
       system_documentation_url: https://github.com/byu-oit-appdev/ical-parser
-      source_repo_url: https://github.com/test-ndpete-org/ical-parser
       swagger_urls:
     microservice: true
     technologies_used:
@@ -96,5 +96,4 @@ deployables:
       env: production
       team:
       app: ical2json rest web serivce
-    federation_json_url: https://raw.githubusercontent.com/test-ndpete-org/ical-parser/master/.repo-meta.yml
     x-anything:
